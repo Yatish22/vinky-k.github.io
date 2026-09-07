@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The Coder Girl Part 2: The Decoder – Vinky K</title>
+<meta name="description" content="The Decoder by Vinky K — The Coder Girl Part 2. New clues. Hidden truths. The case was never closed."/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#080004;
+  --bg2:#0f0008;
+  --bg3:#140010;
+  --red:#ff0040;
+  --red-dim:#cc0033;
+  --red-dark:#4a0015;
+  --red-glow:rgba(255,0,64,0.15);
+  --amber:#ffaa00;
+  --green:#00ff41;
+  --white:#fff0f3;
+  --muted:rgba(255,240,243,0.4);
+  --border:rgba(255,0,64,0.12);
+  --font-mono:'Share Tech Mono',monospace;
+  --font-display:'Orbitron',monospace;
+  --font-body:'Inter',sans-serif;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--white);font-family:var(--font-mono);font-size:15px;line-height:1.7;overflow-x:hidden;cursor:none;}
+
+/* Scanlines */
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.04) 2px,rgba(0,0,0,0.04) 4px);pointer-events:none;z-index:1000;}
+
+/* Cursor — red this time */
+.cursor{position:fixed;width:4px;height:20px;background:var(--red);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);animation:blink .7s step-end infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1.1rem 3rem;background:rgba(8,0,4,0.96);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;backdrop-filter:blur(10px);}
+.nav-logo{font-family:var(--font-display);font-size:11px;color:var(--red);text-decoration:none;letter-spacing:.15em;}
+.nav-series{font-size:11px;color:var(--muted);letter-spacing:.08em;display:flex;align-items:center;gap:10px;}
+.nav-series a{color:rgba(255,240,243,0.35);text-decoration:none;font-size:10px;letter-spacing:.1em;transition:color .2s;}
+.nav-series a:hover{color:var(--red);}
+.nav-sep{color:rgba(255,0,64,0.3);}
+.nav-status{font-size:11px;color:var(--red);display:flex;align-items:center;gap:6px;}
+.nav-status::before{content:'';width:6px;height:6px;background:var(--red);border-radius:50%;animation:pulse-red 1.5s infinite;box-shadow:0 0 8px var(--red);}
+@keyframes pulse-red{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.3;transform:scale(.7);}}
+
+/* HERO */
+.hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:7rem 3rem 3rem;gap:4rem;position:relative;overflow:hidden;}
+
+/* Animated BG */
+#bg-canvas{position:absolute;inset:0;opacity:.12;z-index:0;}
+
+.hero-ambient{position:absolute;inset:0;z-index:0;
+  background:radial-gradient(ellipse 60% 60% at 30% 50%,rgba(255,0,64,0.08),transparent 70%),
+  radial-gradient(ellipse 40% 50% at 80% 80%,rgba(255,170,0,0.04),transparent 60%);}
+
+/* Glitch title */
+.hero-left{position:relative;z-index:2;}
+.hero-part-badge{display:inline-flex;align-items:center;gap:8px;font-size:10px;color:var(--red);letter-spacing:.2em;text-transform:uppercase;border:1px solid rgba(255,0,64,.3);padding:5px 14px;margin-bottom:1.5rem;background:rgba(255,0,64,.05);opacity:0;animation:slideIn .6s .2s forwards;}
+.hero-part-badge::before{content:'';width:5px;height:5px;background:var(--red);border-radius:50%;animation:pulse-red 1.5s infinite;}
+@keyframes slideIn{from{opacity:0;transform:translateX(-20px);}to{opacity:1;transform:translateX(0);}}
+
+.hero-title{font-family:var(--font-display);line-height:.9;margin-bottom:1.5rem;opacity:0;animation:slideIn .7s .4s forwards;}
+.hero-title .part{font-size:clamp(1.2rem,2.5vw,1.8rem);color:var(--muted);letter-spacing:.1em;display:block;margin-bottom:.4rem;}
+.hero-title .main{font-size:clamp(3rem,7vw,6.5rem);color:var(--white);letter-spacing:.02em;display:block;}
+.hero-title .sub{font-size:clamp(2rem,5vw,4.5rem);color:var(--red);letter-spacing:.06em;display:block;text-shadow:0 0 30px rgba(255,0,64,.5);}
+
+/* Glitch effect on subtitle */
+.glitch-wrap{position:relative;display:inline-block;}
+.glitch-wrap::before,.glitch-wrap::after{content:attr(data-text);position:absolute;inset:0;display:block;}
+.glitch-wrap::before{color:#00f5d4;animation:glitch-a 5s infinite;clip-path:polygon(0 15%,100% 15%,100% 35%,0 35%);}
+.glitch-wrap::after{color:#ff8c00;animation:glitch-b 5s infinite;clip-path:polygon(0 65%,100% 65%,100% 80%,0 80%);}
+@keyframes glitch-a{0%,90%,100%{transform:none;opacity:0;}91%{transform:translate(-3px,1px);opacity:.7;}94%{transform:translate(3px,-1px);opacity:.7;}97%{transform:translate(-1px,2px);opacity:.7;}}
+@keyframes glitch-b{0%,88%,100%{transform:none;opacity:0;}89%{transform:translate(3px,1px);opacity:.7;}92%{transform:translate(-3px,-2px);opacity:.7;}95%{transform:translate(2px,-1px);opacity:.7;}}
+
+.hero-author{font-family:var(--font-mono);font-size:12px;color:var(--muted);letter-spacing:.25em;text-transform:uppercase;margin-bottom:.5rem;opacity:0;animation:slideIn .6s .55s forwards;}
+.hero-date{font-family:var(--font-mono);font-size:11px;color:var(--amber);letter-spacing:.15em;margin-bottom:2rem;opacity:0;animation:slideIn .6s .65s forwards;}
+.hero-hook{font-family:var(--font-body);font-size:15px;color:rgba(255,240,243,.6);line-height:1.85;max-width:420px;margin-bottom:2.5rem;opacity:0;animation:slideIn .6s .75s forwards;}
+.hero-hook strong{color:var(--white);}
+
+.hero-btns{display:flex;gap:.75rem;flex-wrap:wrap;opacity:0;animation:slideIn .6s .9s forwards;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:.85rem 1.8rem;font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;transition:all .25s;cursor:none;}
+.btn-red{background:var(--red);color:var(--bg);border:1px solid var(--red);font-weight:700;}
+.btn-red:hover{background:transparent;color:var(--red);box-shadow:0 0 25px rgba(255,0,64,.3);}
+.btn-outline{background:transparent;color:var(--muted);border:1px solid var(--border);}
+.btn-outline:hover{border-color:var(--red);color:var(--red);}
+.btn-part1{background:rgba(0,255,65,.06);color:var(--green);border:1px solid rgba(0,255,65,.2);}
+.btn-part1:hover{background:rgba(0,255,65,.12);}
+
+/* BOOK COVER — right side */
+.hero-right{position:relative;z-index:2;display:flex;justify-content:center;align-items:center;}
+.book-wrap{position:relative;}
+.book-cover{width:240px;height:350px;border-radius:2px 10px 10px 2px;background:linear-gradient(160deg,#0a0005,#1a000d,#2d0018);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem 1.5rem;position:relative;overflow:hidden;
+  box-shadow:-8px 0 24px rgba(0,0,0,.9),0 0 80px rgba(255,0,64,.12),0 30px 60px rgba(0,0,0,.7);
+  transform:perspective(800px) rotateY(-8deg);transition:transform .5s ease;}
+.book-cover:hover{transform:perspective(800px) rotateY(0deg);}
+.book-spine{position:absolute;left:-13px;top:0;bottom:0;width:13px;background:linear-gradient(180deg,#050002,#0a0005);border-radius:2px 0 0 2px;box-shadow:-4px 0 12px rgba(0,0,0,.8);}
+
+/* Red circuit overlay */
+.cover-circuit{position:absolute;inset:0;opacity:.15;overflow:hidden;border-radius:2px 10px 10px 2px;}
+.cover-circuit svg{width:100%;height:100%;}
+
+/* Scan line on cover */
+.cover-scan{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--red),transparent);opacity:0;animation:scan 3s ease-in-out infinite;}
+@keyframes scan{0%{top:0%;opacity:0;}10%{opacity:.8;}90%{opacity:.8;}100%{top:100%;opacity:0;}}
+
+.cover-ascii{font-size:8px;color:var(--red-dark);line-height:1.4;position:absolute;inset:0;padding:.75rem;opacity:.5;white-space:pre;overflow:hidden;letter-spacing:.05em;}
+.cover-main{position:relative;z-index:2;text-align:center;}
+.cover-icon{font-size:2rem;margin-bottom:.75rem;filter:drop-shadow(0 0 12px rgba(255,0,64,.8));}
+.cover-p2-badge{font-family:var(--font-mono);font-size:8px;letter-spacing:.2em;color:var(--red);border:1px solid rgba(255,0,64,.3);padding:3px 10px;margin-bottom:.75rem;display:inline-block;background:rgba(255,0,64,.06);}
+.cover-title-text{font-family:var(--font-display);font-size:1.4rem;line-height:1.05;color:var(--white);letter-spacing:.04em;}
+.cover-title-text .red{color:var(--red);text-shadow:0 0 15px rgba(255,0,64,.6);}
+.cover-divider{width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--red),transparent);margin:.75rem auto;}
+.cover-author-text{font-family:var(--font-mono);font-size:9px;letter-spacing:.2em;color:rgba(255,240,243,.35);text-transform:uppercase;}
+
+.book-badge-circle{position:absolute;top:-18px;right:-18px;width:68px;height:68px;background:var(--red);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-mono);font-size:8px;font-weight:700;color:white;text-align:center;letter-spacing:.05em;line-height:1.4;z-index:3;animation:spin 12s linear infinite;box-shadow:0 0 20px rgba(255,0,64,.5);}
+@keyframes spin{from{transform:rotate(0deg);}to{transform:rotate(360deg);}}
+
+/* Floating decode tags */
+.ftag{position:absolute;font-size:10px;color:var(--red);opacity:.45;white-space:nowrap;letter-spacing:.08em;}
+.ft1{top:10%;left:-110px;}
+.ft2{bottom:15%;right:-95px;color:var(--amber);}
+.ft3{top:55%;left:-85px;color:rgba(0,255,65,.5);font-size:9px;}
+
+/* STRIP */
+.data-strip{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.data-item{padding:1.5rem;text-align:center;border-right:1px solid var(--border);transition:background .3s;}
+.data-item:last-child{border-right:none;}
+.data-item:hover{background:rgba(255,0,64,.04);}
+.data-val{font-family:var(--font-display);font-size:1.4rem;color:var(--red);display:block;line-height:1;text-shadow:0 0 10px rgba(255,0,64,.4);}
+.data-label{font-size:10px;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;margin-top:6px;display:block;}
+
+/* SECTIONS */
+section{padding:5rem 3rem;position:relative;}
+.sec-eyebrow{font-size:10px;color:var(--red);letter-spacing:.22em;text-transform:uppercase;margin-bottom:.75rem;display:flex;align-items:center;gap:8px;}
+.sec-eyebrow::before{content:'//';color:rgba(255,0,64,.4);}
+.sec-title{font-family:var(--font-display);font-size:clamp(1.8rem,4vw,3rem);line-height:1;letter-spacing:.04em;color:var(--white);margin-bottom:2rem;}
+.sec-title .red{color:var(--red);text-shadow:0 0 20px rgba(255,0,64,.3);}
+
+/* SYNOPSIS */
+.synopsis-bg{background:var(--bg2);border-top:1px solid var(--border);}
+.synopsis-grid{display:grid;grid-template-columns:3fr 2fr;gap:4rem;align-items:start;}
+.synopsis-text{font-family:var(--font-body);font-size:15px;color:rgba(255,240,243,.65);line-height:1.95;}
+.synopsis-text p+p{margin-top:1rem;}
+.synopsis-text strong{color:var(--red);}
+.synopsis-text em{color:var(--white);font-style:normal;}
+
+.decode-box{background:var(--bg);border:1px solid var(--border);padding:1.5rem;margin-top:1.5rem;position:relative;overflow:hidden;}
+.decode-box::before{content:'DECODING...';position:absolute;top:8px;right:12px;font-size:9px;color:rgba(255,0,64,.3);letter-spacing:.15em;animation:flicker 3s infinite;}
+@keyframes flicker{0%,100%{opacity:.3;}45%{opacity:.3;}50%{opacity:.8;}55%{opacity:.3;}80%{opacity:.3;}85%{opacity:.6;}90%{opacity:.3;}}
+.decode-line{font-size:12px;color:var(--muted);line-height:2;display:flex;gap:10px;}
+.decode-line .key{color:var(--red);min-width:80px;}
+.decode-line .val{color:var(--white);}
+
+.quote-block{border-left:2px solid var(--red);padding:1.25rem 1.75rem;background:rgba(255,0,64,.03);font-family:var(--font-body);font-style:italic;font-size:15px;color:var(--white);line-height:1.85;margin-bottom:1.5rem;}
+.quote-block cite{display:block;margin-top:.75rem;font-style:normal;font-size:10px;color:var(--red);letter-spacing:.12em;}
+
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:1.5rem;}
+.tag{font-size:10px;padding:4px 10px;border:1px solid var(--border);color:var(--muted);letter-spacing:.08em;}
+.tag.r{border-color:rgba(255,0,64,.3);color:var(--red);}
+
+/* CHARACTERS */
+.chars-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2rem;}
+.char-card{border:1px solid var(--border);padding:1.5rem;background:var(--bg);position:relative;overflow:hidden;transition:border-color .3s,transform .3s;}
+.char-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;transform:scaleX(0);transition:transform .4s cubic-bezier(.22,1,.36,1);transform-origin:left;}
+.char-card:hover{transform:translateY(-4px);}
+.char-card:hover::after{transform:scaleX(1);}
+.char-card.new-char::after{background:var(--red);}
+.char-card.new-char:hover{border-color:rgba(255,0,64,.4);}
+.char-card.returning::after{background:var(--green);}
+.char-card.returning:hover{border-color:rgba(0,255,65,.3);}
+.char-card.mystery::after{background:var(--amber);}
+.char-card.mystery:hover{border-color:rgba(255,170,0,.3);}
+
+.char-tag{font-size:9px;letter-spacing:.15em;text-transform:uppercase;padding:2px 8px;margin-bottom:.75rem;display:inline-block;}
+.new-char .char-tag{background:rgba(255,0,64,.1);color:var(--red);border:1px solid rgba(255,0,64,.2);}
+.returning .char-tag{background:rgba(0,255,65,.08);color:var(--green);border:1px solid rgba(0,255,65,.15);}
+.mystery .char-tag{background:rgba(255,170,0,.08);color:var(--amber);border:1px solid rgba(255,170,0,.15);}
+
+.char-id{font-size:10px;color:rgba(255,240,243,.25);letter-spacing:.12em;margin-bottom:.3rem;}
+.char-name{font-family:var(--font-display);font-size:.95rem;letter-spacing:.05em;margin-bottom:4px;}
+.new-char .char-name{color:var(--red);}
+.returning .char-name{color:var(--green);}
+.mystery .char-name{color:var(--amber);}
+.char-role{font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.75rem;padding-bottom:.5rem;border-bottom:1px solid var(--border);}
+.char-desc{font-family:var(--font-body);font-size:13px;color:rgba(255,240,243,.55);line-height:1.7;}
+
+/* PART 1 BRIDGE */
+.bridge-section{background:var(--bg3);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.bridge-inner{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center;}
+.bridge-book{display:flex;gap:1.5rem;align-items:center;}
+.mini-book{width:80px;height:115px;border-radius:2px 6px 6px 2px;position:relative;display:flex;align-items:center;justify-content:center;box-shadow:-4px 0 12px rgba(0,0,0,.7);}
+.mini-book .mini-spine{position:absolute;left:-5px;top:0;bottom:0;width:5px;border-radius:2px 0 0 2px;}
+.mini-book-title{font-family:var(--font-display);font-size:.5rem;letter-spacing:.05em;text-align:center;line-height:1.3;padding:.5rem;}
+.bridge-arrow{font-size:2rem;color:var(--muted);}
+.bridge-text .sec-title{margin-bottom:1rem;}
+.bridge-text p{font-family:var(--font-body);font-size:14px;color:rgba(255,240,243,.55);line-height:1.85;}
+.bridge-text p strong{color:var(--white);}
+.bridge-cta{display:inline-flex;align-items:center;gap:6px;margin-top:1.5rem;font-size:11px;color:var(--green);letter-spacing:.1em;text-decoration:none;border-bottom:1px solid rgba(0,255,65,.2);padding-bottom:2px;transition:border-color .2s;}
+.bridge-cta:hover{border-color:var(--green);}
+
+/* BUY */
+.buy-section{background:var(--bg);border-top:1px solid var(--border);text-align:center;}
+.buy-inner{max-width:640px;margin:0 auto;}
+.terminal-buy{background:var(--bg2);border:1px solid var(--border);padding:1.75rem;margin:2rem auto;max-width:480px;text-align:left;}
+.t-line-buy{font-size:12px;color:var(--muted);line-height:2.2;display:flex;gap:8px;}
+.t-cmd-buy{color:var(--red);}
+.t-out-buy{color:var(--white);}
+.t-out-buy.g{color:var(--green);}
+.buy-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:2rem;}
+
+/* REVIEWS */
+.reviews-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem;margin-top:2rem;}
+.review-card{background:var(--bg2);border:1px solid var(--border);padding:1.75rem;position:relative;transition:border-color .3s,transform .3s;}
+.review-card:hover{border-color:rgba(255,0,64,.2);transform:translateY(-3px);}
+.review-stars{color:var(--amber);font-size:13px;letter-spacing:3px;margin-bottom:.75rem;}
+.review-text{font-family:var(--font-body);font-size:13px;color:rgba(255,240,243,.6);line-height:1.8;font-style:italic;margin-bottom:.75rem;}
+.review-by{font-size:10px;color:var(--red);letter-spacing:.1em;}
+
+/* SERIES NAV */
+.series-nav{background:var(--bg2);border-top:1px solid var(--border);padding:4rem 3rem;}
+.series-label{font-size:10px;color:var(--muted);letter-spacing:.2em;text-transform:uppercase;margin-bottom:2rem;text-align:center;}
+.series-books{display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;align-items:stretch;}
+.series-book{background:var(--bg);border:1px solid var(--border);padding:1.5rem;display:flex;gap:1rem;align-items:center;max-width:300px;text-decoration:none;transition:border-color .3s,transform .3s;}
+.series-book:hover{border-color:rgba(255,0,64,.3);transform:translateY(-3px);}
+.series-book-cover{width:52px;height:76px;border-radius:1px 5px 5px 1px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.2rem;position:relative;}
+.series-book-spine{position:absolute;left:-4px;top:0;bottom:0;width:4px;border-radius:1px 0 0 1px;}
+.series-book-info{}
+.series-book-num{font-size:9px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:3px;}
+.series-book-title{font-family:var(--font-display);font-size:.75rem;letter-spacing:.04em;color:var(--white);line-height:1.2;margin-bottom:4px;}
+.series-book-status{font-size:9px;letter-spacing:.1em;padding:2px 7px;display:inline-block;}
+
+/* FOOTER */
+footer{padding:2rem 3rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;background:var(--bg);}
+.footer-logo{font-family:var(--font-display);font-size:11px;color:var(--red);text-decoration:none;letter-spacing:.1em;}
+.footer-copy{font-size:11px;color:var(--muted);}
+.footer-links{display:flex;gap:2rem;}
+.footer-links a{font-size:11px;color:var(--muted);text-decoration:none;transition:color .2s;letter-spacing:.06em;}
+.footer-links a:hover{color:var(--red);}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .7s ease,transform .7s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+.reveal-d1{transition-delay:.1s;}
+.reveal-d2{transition-delay:.2s;}
+.reveal-d3{transition-delay:.3s;}
+
+@media(max-width:768px){
+  nav{padding:1rem 1.5rem;}
+  .nav-series span:not(.nav-sep):not(:last-child){display:none;}
+  .hero{grid-template-columns:1fr;padding:6rem 1.5rem 3rem;gap:3rem;}
+  .hero-right{order:-1;}
+  .ft1,.ft2,.ft3{display:none;}
+  section{padding:3rem 1.5rem;}
+  .synopsis-grid{grid-template-columns:1fr;gap:2rem;}
+  .chars-grid{grid-template-columns:1fr;}
+  .data-strip{grid-template-columns:1fr 1fr;}
+  .data-item:nth-child(2){border-right:none;}
+  .bridge-inner{grid-template-columns:1fr;gap:2rem;}
+  footer{flex-direction:column;padding:1.5rem;text-align:center;}
+  .footer-links{justify-content:center;}
+  body{cursor:auto;}
+  .cursor{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<canvas id="bg-canvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="index.html">VK.EXE</a>
+  <div class="nav-series">
+    <a href="the-coder-girl.html">Part 1</a>
+    <span class="nav-sep">/</span>
+    <span style="color:var(--red);">Part 2: The Decoder</span>
+  </div>
+  <div class="nav-status">CASE REOPENED</div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-ambient"></div>
+
+  <div class="hero-left">
+    <div class="hero-part-badge">Series · Book 2 of The Coder Girl</div>
+    <h1 class="hero-title">
+      <span class="part">The Coder Girl</span>
+      <span class="main">Part II</span>
+      <span class="sub"><span class="glitch-wrap" data-text="The Decoder">The Decoder</span></span>
+    </h1>
+    <p class="hero-author">by Vinky K</p>
+    <p class="hero-date">Released · July 2, 2026</p>
+    <p class="hero-hook">Months have passed. The case was closed. <strong>It wasn't.</strong><br>New clues. Dangerous discoveries. And Prisha — still at the centre of it all, still hiding the missing pieces.</p>
+    <div class="hero-btns">
+      <a href="https://www.amazon.in/Coder-Girl-Part-Decoder/dp/B0H7CSJSG1" target="_blank" class="btn btn-red">🛒 Buy on Amazon</a>
+      <a href="#synopsis" class="btn btn-outline">Read Synopsis ↓</a>
+      <a href="the-coder-girl.html" class="btn btn-part1">← Read Part 1 First</a>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="book-wrap">
+      <div class="book-cover">
+        <div class="book-spine"></div>
+        <div class="cover-circuit">
+          <svg viewBox="0 0 240 350" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line x1="20" y1="0" x2="20" y2="350" stroke="#ff0040" stroke-width="0.6"/>
+            <line x1="120" y1="0" x2="120" y2="350" stroke="#ff0040" stroke-width="0.4"/>
+            <line x1="220" y1="0" x2="220" y2="350" stroke="#ff0040" stroke-width="0.3"/>
+            <line x1="0" y1="80" x2="240" y2="80" stroke="#ff0040" stroke-width="0.5"/>
+            <line x1="0" y1="180" x2="240" y2="180" stroke="#ff0040" stroke-width="0.6"/>
+            <line x1="0" y1="270" x2="240" y2="270" stroke="#ff0040" stroke-width="0.4"/>
+            <circle cx="20" cy="80" r="3" fill="#ff0040" opacity=".9"/>
+            <circle cx="120" cy="180" r="6" fill="#ff0040" opacity=".7"/>
+            <circle cx="220" cy="270" r="3" fill="#ffaa00" opacity=".8"/>
+            <circle cx="20" cy="270" r="4" fill="#ff0040" opacity=".5"/>
+            <path d="M 40 110 L 80 110 L 80 150 L 100 150" stroke="#ff0040" stroke-width="0.5" fill="none" opacity=".6"/>
+            <path d="M 140 200 L 180 200 L 180 240 L 200 240" stroke="#ffaa00" stroke-width="0.5" fill="none" opacity=".5"/>
+            <rect x="76" y="104" width="14" height="14" rx="1" stroke="#ff0040" stroke-width="0.6" fill="none" opacity=".7"/>
+            <rect x="176" y="234" width="14" height="14" rx="1" stroke="#ffaa00" stroke-width="0.6" fill="none" opacity=".6"/>
+            <text x="30" y="40" fill="#ff0040" font-size="7" opacity=".4" font-family="monospace">DECODE_INIT</text>
+            <text x="130" y="300" fill="#ff0040" font-size="6" opacity=".3" font-family="monospace">CASE_REOPEN</text>
+          </svg>
+        </div>
+        <div class="cover-scan"></div>
+        <div class="cover-ascii">FF 00 40 DE CO DE
+01 01 00 00 FF 3C
+DE 00 AD 00 00 00
+00 FF 40 EC LI PS
+CA SE RE OP EN ED
+PR IS HA ?? ?? ??
+EC LI PS E. IN IT
+DE CO DE R. EX E
+00 FF 40 00 00 01</div>
+        <div class="cover-main">
+          <div class="cover-icon">🔓</div>
+          <div class="cover-p2-badge">Part II · The Decoder</div>
+          <div class="cover-title-text">THE <span class="red">DECODER</span></div>
+          <div class="cover-divider"></div>
+          <div class="cover-author-text">Vinky K</div>
+        </div>
+      </div>
+      <div class="book-badge-circle">PART<br>TWO<br>2026</div>
+      <div class="ftag ft1">// case.reopened = true</div>
+      <div class="ftag ft2">decode.run() →</div>
+      <div class="ftag ft3">// prisha.secrets++</div>
+    </div>
+  </div>
+</section>
+
+<!-- DATA STRIP -->
+<div class="data-strip reveal">
+  <div class="data-item"><span class="data-val">2026</span><span class="data-label">Released</span></div>
+  <div class="data-item"><span class="data-val">PT.2</span><span class="data-label">In Series</span></div>
+  <div class="data-item"><span class="data-val">↑</span><span class="data-label">Stakes</span></div>
+  <div class="data-item"><span class="data-val">?</span><span class="data-label">Truth</span></div>
+</div>
+
+<!-- SYNOPSIS -->
+<section class="synopsis-bg" id="synopsis">
+  <div class="sec-eyebrow">Synopsis</div>
+  <h2 class="sec-title reveal">The <span class="red">Case</span> Reopens</h2>
+  <div class="synopsis-grid">
+    <div>
+      <div class="synopsis-text reveal">
+        <p>Months after the events that shook TechNovva Solutions, the world moved on. The case was closed, the questions buried. But <em>buried things have a way of surfacing</em>.</p>
+        <p>When investigator <strong>Dhruv</strong> begins uncovering hidden inconsistencies that don't add up, and coder <strong>Vidya</strong> stumbles onto clues that were never meant to be found, the forgotten case tears itself back open — more dangerous than before.</p>
+        <p>At the centre of it all, still and silent, is <strong>Prisha</strong>. She holds the missing pieces. She always has. But the truth she's been protecting may be the very thing that destroys everything.</p>
+        <p>In a world built on deception, where artificial intelligence blurs the line between real and constructed, <em>The Decoder</em> asks the question the first book dared not answer: <strong>what happens when the truth finally comes out?</strong></p>
+      </div>
+      <div class="tags reveal">
+        <span class="tag r">#TheDecoder</span>
+        <span class="tag r">#Part2</span>
+        <span class="tag r">#HiddenTruths</span>
+        <span class="tag">#AI</span><span class="tag">#Deception</span>
+        <span class="tag">#Dhruv</span><span class="tag">#Vidya</span><span class="tag">#Prisha</span>
+      </div>
+      <div class="decode-box reveal" style="margin-top:1.75rem;">
+        <div class="decode-line"><span class="key">CASE_ID</span><span class="val">TCG-002 // ACTIVE</span></div>
+        <div class="decode-line"><span class="key">THREAT</span><span class="val">Eclipse · CRITICAL</span></div>
+        <div class="decode-line"><span class="key">SUBJECT</span><span class="val">Prisha Verma · UNKNOWN</span></div>
+        <div class="decode-line"><span class="key">STATUS</span><span class="val" style="color:var(--red);">DECODING IN PROGRESS...</span></div>
+      </div>
+    </div>
+    <div>
+      <div class="quote-block reveal">
+        "The case was closed. It wasn't. New clues reopen a forgotten truth — and this time, there's no going back."
+        <cite>— The Coder Girl Part 2: The Decoder</cite>
+      </div>
+      <div style="padding:1.5rem;background:rgba(255,0,64,.04);border:1px solid rgba(255,0,64,.12);border-radius:2px;margin-top:1.5rem;" class="reveal">
+        <div style="font-size:10px;color:var(--red);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.5rem;">⚠ Continuity Warning</div>
+        <p style="font-family:var(--font-body);font-size:13px;color:var(--muted);line-height:1.7;">Read <em>The Coder Girl Part 1</em> first. Part 2 picks up directly from where the first book left things — and the revelations hit harder when you know what came before.</p>
+        <a href="the-coder-girl.html" style="display:inline-block;margin-top:1rem;font-size:11px;color:var(--green);letter-spacing:.1em;text-decoration:none;border-bottom:1px solid rgba(0,255,65,.2);padding-bottom:2px;">Read Part 1 first →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHARACTERS -->
+<section>
+  <div class="sec-eyebrow">Character Files</div>
+  <h2 class="sec-title reveal">The <span class="red">Players</span> — Part II</h2>
+  <div class="chars-grid">
+    <div class="char-card new-char reveal">
+      <div><span class="char-tag">New · Investigator</span></div>
+      <div class="char-id">SUBJECT_004</div>
+      <div class="char-name">DHRUV</div>
+      <div class="char-role">Investigator · Sees the Cracks</div>
+      <div class="char-desc">Methodical. Relentless. Dhruv notices hidden inconsistencies no one else bothered to look for. The deeper he digs, the more dangerous things become.</div>
+    </div>
+    <div class="char-card new-char reveal reveal-d1">
+      <div><span class="char-tag">New · Coder</span></div>
+      <div class="char-id">SUBJECT_005</div>
+      <div class="char-name">VIDYA</div>
+      <div class="char-role">Coder · Finder of Dangerous Clues</div>
+      <div class="char-desc">She wasn't looking for trouble. But the clues she finds buried in the code are the kind people disappear for knowing. Now she can't unsee them.</div>
+    </div>
+    <div class="char-card mystery reveal reveal-d2">
+      <div><span class="char-tag">Returning · Central</span></div>
+      <div class="char-id">SUBJECT_001</div>
+      <div class="char-name">PRISHA</div>
+      <div class="char-role">Holds the Missing Pieces</div>
+      <div class="char-desc">She's back. Quieter. More guarded. She holds the answers Dhruv and Vidya are risking everything to find — and she's not sure they're ready for the truth.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PART 1 BRIDGE -->
+<section class="bridge-section">
+  <div class="bridge-inner">
+    <div class="reveal">
+      <div class="sec-eyebrow">Read in Order</div>
+      <h2 class="sec-title bridge-text">Start with <span class="red">Part One</span></h2>
+      <p style="font-family:var(--font-body);font-size:15px;color:rgba(255,240,243,.55);line-height:1.9;">The Decoder is Part 2 of a continuing series. To fully experience the revelations — and feel the weight of what Prisha has been hiding — start with <strong>The Coder Girl</strong>.</p>
+      <a href="the-coder-girl.html" class="bridge-cta">Explore Part 1: The Coder Girl →</a>
+    </div>
+    <div class="bridge-book reveal">
+      <div class="mini-book" style="background:linear-gradient(160deg,#0d0d1a,#0f3460);">
+        <div class="mini-spine" style="background:linear-gradient(180deg,#060810,#0a1020);"></div>
+        <div class="mini-book-title" style="color:#00f5d4;font-family:'Orbitron',monospace;font-size:.45rem;">THE<br><span style="color:#f0f0f8;">CODER</span><br>GIRL</div>
+      </div>
+      <div style="font-size:1.8rem;color:rgba(255,0,64,.4);">→</div>
+      <div class="mini-book" style="background:linear-gradient(160deg,#0a0005,#2d0018);">
+        <div class="mini-spine" style="background:linear-gradient(180deg,#050002,#0a0005);"></div>
+        <div class="mini-book-title" style="color:#ff0040;font-family:'Orbitron',monospace;font-size:.4rem;">THE<br><span style="color:#fff0f3;">DECODER</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- BUY -->
+<section class="buy-section" id="buy">
+  <div class="buy-inner">
+    <div class="sec-eyebrow" style="justify-content:center;">Get Your Copy</div>
+    <h2 class="sec-title reveal" style="text-align:center;">Acquire <span class="red">The Decoder</span></h2>
+    <div class="terminal-buy reveal">
+      <div class="t-line-buy"><span class="t-cmd-buy">$</span><span class="t-out-buy"> get book --id "the-decoder" --series "coder-girl" --part 2</span></div>
+      <div class="t-line-buy"><span class="t-cmd-buy"> </span><span class="t-out-buy g">✓ Found: The Coder Girl Part 2: The Decoder</span></div>
+      <div class="t-line-buy"><span class="t-cmd-buy"> </span><span class="t-out-buy g">✓ Author: Vinky K · Released: July 2, 2026</span></div>
+      <div class="t-line-buy"><span class="t-cmd-buy"> </span><span class="t-out-buy g">✓ Available: Amazon India</span></div>
+      <div class="t-line-buy"><span class="t-cmd-buy"> </span><span class="t-out-buy" style="color:var(--red);">→ Select platform to acquire</span></div>
+    </div>
+    <div class="buy-btns reveal">
+      <a href="https://www.amazon.in/Coder-Girl-Part-Decoder/dp/B0H7CSJSG1" target="_blank" class="btn btn-red" style="padding:1rem 2.5rem;">🛒 Buy on Amazon India</a>
+      <a href="the-coder-girl.html" class="btn btn-part1" style="padding:1rem 2rem;">← Also get Part 1</a>
+    </div>
+  </div>
+</section>
+
+<!-- SERIES NAV -->
+<div class="series-nav">
+  <div class="series-label">The Coder Girl Series — Vinky K</div>
+  <div class="series-books">
+    <a href="the-coder-girl.html" class="series-book reveal">
+      <div class="series-book-cover" style="background:linear-gradient(160deg,#0d0d1a,#0f3460);">
+        <div class="series-book-spine" style="background:#060810;"></div>
+        <span style="font-size:1rem;">⚡</span>
+      </div>
+      <div class="series-book-info">
+        <div class="series-book-num">Book 1</div>
+        <div class="series-book-title">The Coder Girl</div>
+        <div class="series-book-status" style="background:rgba(0,255,65,.08);color:var(--green);border:1px solid rgba(0,255,65,.15);">Available</div>
+      </div>
+    </a>
+    <a href="https://www.amazon.in/Coder-Girl-Part-Decoder/dp/B0H7CSJSG1" target="_blank" class="series-book reveal reveal-d1" style="border-color:rgba(255,0,64,.2);">
+      <div class="series-book-cover" style="background:linear-gradient(160deg,#0a0005,#2d0018);">
+        <div class="series-book-spine" style="background:#050002;"></div>
+        <span style="font-size:1rem;">🔓</span>
+      </div>
+      <div class="series-book-info">
+        <div class="series-book-num">Book 2</div>
+        <div class="series-book-title">The Decoder</div>
+        <div class="series-book-status" style="background:rgba(255,0,64,.08);color:var(--red);border:1px solid rgba(255,0,64,.15);">New Release</div>
+      </div>
+    </a>
+    <div class="series-book reveal reveal-d2" style="opacity:.5;cursor:default;border-style:dashed;">
+      <div class="series-book-cover" style="background:#0d0d0d;">
+        <div class="series-book-spine" style="background:#080808;"></div>
+        <span style="font-size:1rem;opacity:.3;">📖</span>
+      </div>
+      <div class="series-book-info">
+        <div class="series-book-num">Book 3</div>
+        <div class="series-book-title" style="color:var(--muted);">Coming Soon</div>
+        <div class="series-book-status" style="background:rgba(255,255,255,.03);color:var(--muted);border:1px solid var(--border);">TBA</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <a class="footer-logo" href="index.html">VK.EXE // VINKY K</a>
+  <span class="footer-copy">© 2026 Vinky K. All rights reserved.</span>
+  <div class="footer-links">
+    <a href="index.html">Author Home</a>
+    <a href="the-coder-girl.html">Part 1</a>
+    <a href="https://www.amazon.in/Coder-Girl-Part-Decoder/dp/B0H7CSJSG1" target="_blank">Amazon</a>
+  </div>
+</footer>
+
+<script>
+// Falling red particles canvas
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+function resize(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+resize();
+window.addEventListener('resize',resize);
+const chars = '01デコードERROR??DECODE10ECLIPSE??PRISHA10FF0040';
+const cols = Math.floor(canvas.width / 20);
+const drops = Array(cols).fill(1);
+function draw(){
+  ctx.fillStyle='rgba(8,0,4,0.06)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  drops.forEach((y,i)=>{
+    const char = chars[Math.floor(Math.random()*chars.length)];
+    const shade = Math.random();
+    if(shade > .95) ctx.fillStyle='#ffaa00';
+    else if(shade > .8) ctx.fillStyle='rgba(255,0,64,0.9)';
+    else ctx.fillStyle='rgba(255,0,64,0.3)';
+    ctx.font='13px Share Tech Mono';
+    ctx.fillText(char, i*20, y*20);
+    if(y*20 > canvas.height && Math.random() > .975) drops[i]=0;
+    drops[i]++;
+  });
+}
+setInterval(draw, 55);
+
+// Cursor
+const cur = document.getElementById('cursor');
+document.addEventListener('mousemove', e=>{ cur.style.left=e.clientX+'px'; cur.style.top=e.clientY+'px'; });
+
+// Reveal
+const obs = new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});}
+  });
+});
+</script>
+</body>
+</html>

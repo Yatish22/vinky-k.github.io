@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>The Coder Girl – Vinky K</title>
+<meta name="description" content="The Coder Girl by Vinky K — A gripping mystery thriller about AI, identity, and the boundaries of what it means to be human."/>
+<link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#020c02;
+  --bg2:#041004;
+  --green:#00ff41;
+  --green-dim:#00cc33;
+  --green-dark:#004d10;
+  --green-glow:rgba(0,255,65,0.15);
+  --red:#ff003c;
+  --amber:#ffaa00;
+  --white:#e8ffe8;
+  --muted:rgba(232,255,232,0.4);
+  --border:rgba(0,255,65,0.15);
+  --font-mono:'Share Tech Mono',monospace;
+  --font-display:'Orbitron',monospace;
+  --font-body:'Inter',sans-serif;
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--white);font-family:var(--font-mono);font-size:15px;line-height:1.7;overflow-x:hidden;cursor:none;}
+
+/* Scanlines overlay */
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.03) 2px,rgba(0,0,0,0.03) 4px);pointer-events:none;z-index:1000;}
+
+/* Custom cursor */
+.cursor{position:fixed;width:4px;height:20px;background:var(--green);pointer-events:none;z-index:9999;transform:translate(-50%,-50%);animation:blink .8s step-end infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:1rem 3rem;background:rgba(2,12,2,0.95);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{font-family:var(--font-display);font-size:12px;color:var(--green);text-decoration:none;letter-spacing:.15em;}
+.nav-back{font-size:12px;color:var(--muted);text-decoration:none;letter-spacing:.1em;transition:color .2s;display:flex;align-items:center;gap:6px;}
+.nav-back:hover{color:var(--green);}
+.nav-status{font-size:11px;color:var(--green-dim);display:flex;align-items:center;gap:8px;}
+.nav-status::before{content:'';width:6px;height:6px;background:var(--green);border-radius:50%;animation:pulse-dot 2s infinite;}
+@keyframes pulse-dot{0%,100%{opacity:1;}50%{opacity:.3;}}
+
+/* TERMINAL HERO */
+.hero{min-height:100vh;display:grid;grid-template-columns:1fr 1fr;align-items:center;padding:6rem 3rem 3rem;gap:4rem;position:relative;}
+.hero-bg{position:absolute;inset:0;background:radial-gradient(ellipse 50% 60% at 60% 50%,rgba(0,255,65,0.04),transparent 70%);z-index:0;}
+
+/* Matrix rain canvas */
+#matrix{position:absolute;inset:0;opacity:.07;z-index:0;}
+
+.hero-left{position:relative;z-index:2;}
+
+.terminal-window{background:var(--bg2);border:1px solid var(--border);border-radius:6px;overflow:hidden;box-shadow:0 0 40px rgba(0,255,65,0.08);}
+.terminal-bar{background:#0a1a0a;padding:.6rem 1rem;display:flex;align-items:center;gap:8px;border-bottom:1px solid var(--border);}
+.t-dot{width:10px;height:10px;border-radius:50%;}
+.t-dot.red{background:#ff5f57;}
+.t-dot.yellow{background:#ffbd2e;}
+.t-dot.green{background:#28c840;}
+.terminal-title{font-size:11px;color:var(--muted);margin-left:auto;margin-right:auto;letter-spacing:.1em;}
+.terminal-body{padding:1.5rem;font-size:13px;line-height:2;}
+.t-line{display:flex;gap:8px;flex-wrap:wrap;}
+.t-prompt{color:var(--green-dim);}
+.t-cmd{color:var(--green);}
+.t-out{color:var(--muted);}
+.t-out.hi{color:var(--white);}
+.t-out.red{color:var(--red);}
+.t-out.amber{color:var(--amber);}
+.t-cursor-inline{display:inline-block;width:8px;height:14px;background:var(--green);vertical-align:middle;animation:blink .8s step-end infinite;}
+.t-gap{height:.5rem;}
+
+/* BOOK COVER */
+.hero-right{position:relative;z-index:2;display:flex;justify-content:center;align-items:center;}
+.book-3d{position:relative;width:220px;}
+.book-cover{width:220px;height:320px;background:var(--bg2);border:1px solid var(--green-dark);border-radius:2px 8px 8px 2px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;position:relative;overflow:hidden;box-shadow:-6px 0 20px rgba(0,0,0,.8),0 0 60px rgba(0,255,65,0.12);transform:perspective(700px) rotateY(-6deg);transition:transform .4s;}
+.book-cover:hover{transform:perspective(700px) rotateY(2deg);}
+.book-spine-3d{position:absolute;left:-12px;top:0;bottom:0;width:12px;background:linear-gradient(180deg,#010a01,#020c02);border-radius:2px 0 0 2px;}
+
+/* Glitch lines on cover */
+.cover-glitch{position:absolute;inset:0;overflow:hidden;pointer-events:none;}
+.glitch-line{position:absolute;left:0;right:0;height:1px;background:var(--green);opacity:0;animation:glitch-scan 4s linear infinite;}
+.glitch-line:nth-child(1){animation-delay:0s;}
+.glitch-line:nth-child(2){animation-delay:1.3s;}
+.glitch-line:nth-child(3){animation-delay:2.6s;}
+@keyframes glitch-scan{0%{top:0%;opacity:.6;}100%{top:100%;opacity:0;}}
+
+.cover-ascii{font-family:var(--font-mono);font-size:9px;color:var(--green-dark);line-height:1.3;text-align:left;position:absolute;inset:0;padding:1rem;opacity:.4;white-space:pre;overflow:hidden;}
+.cover-main{position:relative;z-index:2;text-align:center;}
+.cover-icon{font-size:2.2rem;margin-bottom:.75rem;filter:drop-shadow(0 0 8px var(--green));}
+.cover-title{font-family:var(--font-display);font-size:1.5rem;line-height:1.1;letter-spacing:.06em;color:var(--green);text-shadow:0 0 20px rgba(0,255,65,.5);}
+.cover-title span{color:var(--white);}
+.cover-author{font-size:10px;color:var(--muted);letter-spacing:.2em;text-transform:uppercase;margin-top:.75rem;}
+.cover-bar{width:60%;height:2px;background:linear-gradient(90deg,transparent,var(--green),transparent);margin:.75rem auto 0;}
+
+.book-shadow{position:absolute;bottom:-20px;left:10%;right:10%;height:20px;background:radial-gradient(ellipse,rgba(0,255,65,0.15),transparent 70%);filter:blur(8px);}
+
+/* Floating tags */
+.ftag{position:absolute;font-size:10px;color:var(--green);opacity:.5;letter-spacing:.08em;white-space:nowrap;}
+.ftag1{top:15%;left:-100px;}
+.ftag2{bottom:20%;right:-90px;color:var(--amber);}
+
+/* SECTION STYLES */
+section{padding:5rem 3rem;position:relative;}
+.sec-header{margin-bottom:3rem;}
+.sec-eyebrow{font-size:11px;color:var(--green-dim);letter-spacing:.2em;text-transform:uppercase;margin-bottom:.5rem;display:flex;align-items:center;gap:8px;}
+.sec-eyebrow::before{content:'>';color:var(--green);}
+.sec-title{font-family:var(--font-display);font-size:clamp(1.8rem,4vw,3rem);line-height:1;letter-spacing:.05em;color:var(--green);text-shadow:0 0 30px rgba(0,255,65,.2);}
+.sec-title span{color:var(--white);}
+
+/* DETAILS STRIP */
+.strip{display:grid;grid-template-columns:repeat(4,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.strip-item{padding:1.5rem;text-align:center;border-right:1px solid var(--border);}
+.strip-item:last-child{border-right:none;}
+.strip-val{font-family:var(--font-display);font-size:1.4rem;color:var(--green);display:block;line-height:1;text-shadow:0 0 10px rgba(0,255,65,.3);}
+.strip-label{font-size:10px;color:var(--muted);letter-spacing:.15em;text-transform:uppercase;margin-top:6px;display:block;}
+
+/* SYNOPSIS */
+.synopsis-layout{display:grid;grid-template-columns:3fr 2fr;gap:4rem;align-items:start;}
+.synopsis-text{font-family:var(--font-body);font-size:15px;color:rgba(232,255,232,.7);line-height:1.9;}
+.synopsis-text p+p{margin-top:1rem;}
+.synopsis-text strong{color:var(--green);}
+
+.warning-box{background:rgba(255,0,60,.04);border:1px solid rgba(255,0,60,.2);border-radius:4px;padding:1.5rem;margin-top:1.5rem;}
+.warning-box .wb-label{font-size:10px;color:var(--red);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.5rem;}
+.warning-box p{font-family:var(--font-body);font-size:14px;color:var(--muted);line-height:1.7;}
+.warning-box strong{color:var(--white);}
+
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:1.5rem;}
+.tag{font-size:10px;padding:4px 10px;border:1px solid var(--border);color:var(--muted);letter-spacing:.08em;}
+.tag.g{border-color:rgba(0,255,65,.3);color:var(--green-dim);}
+
+.quote-block{border-left:2px solid var(--green);padding:1.5rem;background:rgba(0,255,65,.03);font-family:var(--font-body);font-style:italic;font-size:15px;color:var(--white);line-height:1.8;}
+.quote-block cite{display:block;margin-top:1rem;font-style:normal;font-size:11px;color:var(--green-dim);letter-spacing:.1em;}
+
+/* CHARACTERS */
+.chars-bg{background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border);}
+.chars-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1.5rem;margin-top:2rem;}
+.char-card{border:1px solid var(--border);padding:1.5rem;position:relative;background:var(--bg);transition:border-color .3s,transform .3s;}
+.char-card:hover{border-color:rgba(0,255,65,.4);transform:translateY(-4px);}
+.char-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--green),transparent);transform:scaleX(0);transition:transform .3s;transform-origin:left;}
+.char-card:hover::after{transform:scaleX(1);}
+.char-id{font-size:10px;color:var(--green-dim);letter-spacing:.15em;margin-bottom:.5rem;}
+.char-name{font-family:var(--font-display);font-size:1rem;color:var(--green);margin-bottom:4px;letter-spacing:.05em;}
+.char-card:nth-child(2) .char-name{color:var(--red);}
+.char-card:nth-child(3) .char-name{color:var(--amber);}
+.char-role{font-size:10px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:.75rem;border-bottom:1px solid var(--border);padding-bottom:.5rem;}
+.char-desc{font-family:var(--font-body);font-size:13px;color:rgba(232,255,232,.6);line-height:1.7;}
+.char-status{display:inline-block;font-size:9px;padding:2px 8px;margin-top:.75rem;letter-spacing:.1em;}
+.char-status.unknown{background:rgba(255,170,0,.1);color:var(--amber);border:1px solid rgba(255,170,0,.2);}
+.char-status.ally{background:rgba(0,255,65,.08);color:var(--green-dim);border:1px solid rgba(0,255,65,.15);}
+.char-status.threat{background:rgba(255,0,60,.08);color:var(--red);border:1px solid rgba(255,0,60,.15);}
+
+/* BUY */
+.buy-sec{text-align:center;background:var(--bg2);border-top:1px solid var(--border);}
+.buy-inner{max-width:640px;margin:0 auto;}
+.buy-terminal{background:var(--bg);border:1px solid var(--border);padding:2rem;margin:2rem auto;max-width:480px;text-align:left;}
+.buy-cmd{font-size:13px;color:var(--green);margin-bottom:.5rem;}
+.buy-cmd::before{content:'$ ';color:var(--green-dim);}
+.buy-output{font-size:12px;color:var(--muted);padding-left:1rem;line-height:1.8;}
+.buy-btns{display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;margin-top:1.5rem;}
+
+.btn{display:inline-flex;align-items:center;gap:8px;padding:.8rem 1.8rem;font-family:var(--font-mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;text-decoration:none;border-radius:2px;transition:all .25s;cursor:none;font-weight:400;}
+.btn-green{background:var(--green);color:var(--bg);border:1px solid var(--green);}
+.btn-green:hover{background:transparent;color:var(--green);box-shadow:0 0 20px rgba(0,255,65,.2);}
+.btn-outline{background:transparent;color:var(--green);border:1px solid var(--border);}
+.btn-outline:hover{border-color:var(--green);box-shadow:0 0 15px rgba(0,255,65,.1);}
+.btn-amber{background:rgba(255,170,0,.1);color:var(--amber);border:1px solid rgba(255,170,0,.3);}
+.btn-amber:hover{background:rgba(255,170,0,.2);}
+
+/* REVIEWS */
+.reviews-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.5rem;margin-top:2rem;}
+.review-card{background:var(--bg2);border:1px solid var(--border);padding:1.5rem;position:relative;}
+.review-stars{color:var(--amber);font-size:13px;letter-spacing:3px;margin-bottom:.75rem;}
+.review-text{font-family:var(--font-body);font-size:13px;color:rgba(232,255,232,.6);line-height:1.8;font-style:italic;margin-bottom:.75rem;}
+.review-by{font-size:10px;color:var(--green-dim);letter-spacing:.1em;}
+.review-card::before{content:'"';position:absolute;top:1rem;right:1.5rem;font-size:4rem;color:rgba(0,255,65,.06);font-family:serif;line-height:1;}
+
+/* ALSO */
+.also-card{background:var(--bg2);border:1px dashed var(--border);padding:2rem;display:flex;align-items:center;gap:1.5rem;max-width:420px;transition:border-color .3s;}
+.also-card:hover{border-color:rgba(255,170,0,.3);}
+.also-icon{font-size:2.5rem;opacity:.3;}
+.also-label{font-size:10px;color:var(--amber);letter-spacing:.15em;text-transform:uppercase;margin-bottom:.25rem;}
+.also-name{font-family:var(--font-display);font-size:.9rem;color:var(--muted);}
+
+/* FOOTER */
+footer{padding:2rem 3rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;}
+.footer-logo{font-family:var(--font-display);font-size:11px;color:var(--green-dim);text-decoration:none;letter-spacing:.1em;}
+.footer-copy{font-size:11px;color:var(--muted);}
+.footer-links{display:flex;gap:2rem;}
+.footer-links a{font-size:11px;color:var(--muted);text-decoration:none;transition:color .2s;letter-spacing:.06em;}
+.footer-links a:hover{color:var(--green);}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+.reveal{opacity:0;transform:translateY(24px);transition:opacity .6s ease,transform .6s ease;}
+.reveal.visible{opacity:1;transform:translateY(0);}
+
+/* Glitch text effect */
+.glitch{position:relative;}
+.glitch::before,.glitch::after{content:attr(data-text);position:absolute;inset:0;opacity:.8;}
+.glitch::before{color:var(--red);animation:glitch1 4s infinite;clip-path:polygon(0 20%,100% 20%,100% 40%,0 40%);}
+.glitch::after{color:#00aaff;animation:glitch2 4s infinite;clip-path:polygon(0 60%,100% 60%,100% 80%,0 80%);}
+@keyframes glitch1{0%,94%,100%{transform:none;opacity:0;}95%{transform:translate(-2px,1px);opacity:.6;}97%{transform:translate(2px,-1px);opacity:.6;}}
+@keyframes glitch2{0%,96%,100%{transform:none;opacity:0;}97%{transform:translate(2px,1px);opacity:.6;}99%{transform:translate(-2px,-1px);opacity:.6;}}
+
+@media(max-width:768px){
+  nav{padding:1rem 1.5rem;}
+  .nav-status{display:none;}
+  .hero{grid-template-columns:1fr;padding:6rem 1.5rem 3rem;gap:3rem;}
+  .hero-right{order:-1;}
+  .ftag1,.ftag2{display:none;}
+  section{padding:3rem 1.5rem;}
+  .synopsis-layout{grid-template-columns:1fr;gap:2rem;}
+  .chars-grid{grid-template-columns:1fr;}
+  .strip{grid-template-columns:1fr 1fr;}
+  .strip-item:nth-child(2){border-right:none;}
+  footer{flex-direction:column;padding:1.5rem;text-align:center;}
+  .footer-links{justify-content:center;}
+  body{cursor:auto;}
+  .cursor{display:none;}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<canvas id="matrix"></canvas>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="index.html">VK.EXE</a>
+  <div class="nav-status">SYSTEM ONLINE</div>
+  <a class="nav-back" href="index.html">← all books</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+
+  <div class="hero-left" style="opacity:0;animation:fadeUp .7s .3s forwards;">
+    <div class="terminal-window">
+      <div class="terminal-bar">
+        <div class="t-dot red"></div>
+        <div class="t-dot yellow"></div>
+        <div class="t-dot green"></div>
+        <span class="terminal-title">identity_scan.exe</span>
+      </div>
+      <div class="terminal-body">
+        <div class="t-line"><span class="t-prompt">root@technovva:~$</span><span class="t-cmd"> scan --target prisha_verma</span></div>
+        <div class="t-gap"></div>
+        <div class="t-line"><span class="t-out">[ SCANNING... ]</span></div>
+        <div class="t-line"><span class="t-out">Name &nbsp;&nbsp;&nbsp;: </span><span class="t-out hi">Prisha Verma</span></div>
+        <div class="t-line"><span class="t-out">Role &nbsp;&nbsp;&nbsp;: </span><span class="t-out hi">Senior Dev @ TechNovva</span></div>
+        <div class="t-line"><span class="t-out">Status &nbsp;: </span><span class="t-out amber">⚠ CLASSIFIED</span></div>
+        <div class="t-line"><span class="t-out">Threat &nbsp;: </span><span class="t-out red">ECLIPSE ACTIVE</span></div>
+        <div class="t-gap"></div>
+        <div class="t-line"><span class="t-out">Identity: </span><span class="t-out red">ERROR — UNKNOWN</span></div>
+        <div class="t-line"><span class="t-out">&gt; Prodigy? Creation? Saviour?</span></div>
+        <div class="t-gap"></div>
+        <div class="t-line"><span class="t-prompt">root@technovva:~$</span><span class="t-cmd"> </span><span class="t-cursor-inline"></span></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:1.5rem;">
+      <a href="https://www.amazon.in/Coder-Girl-Vinky/dp/B0FJK427TR" target="_blank" class="btn btn-green">🛒 Buy on Amazon</a>
+      <a href="https://www.flipkart.com/the-coder-girl/p/itm7733293d65a31" target="_blank" class="btn btn-amber">🛍 Flipkart</a>
+      <a href="#synopsis" class="btn btn-outline">Read More ↓</a>
+    </div>
+  </div>
+
+  <div class="hero-right" style="opacity:0;animation:fadeIn 1s .5s forwards;">
+    <div class="book-3d">
+      <div class="book-cover">
+        <div class="book-spine-3d"></div>
+        <div class="cover-ascii">01001000 01110101 01101101
+01100001 01101110 00111111
+01000001 01001001 00111111
+00111111 00111111 00111111
+01010000 01110010 01101001
+01110011 01101000 01100001
+01010110 01100101 01110010
+01101101 01100001 00111111
+00111111 00111111 00111111</div>
+        <div class="cover-glitch">
+          <div class="glitch-line"></div>
+          <div class="glitch-line"></div>
+          <div class="glitch-line"></div>
+        </div>
+        <div class="cover-main">
+          <div class="cover-icon">⚡</div>
+          <div class="cover-title"><span>THE </span>CODER<span> GIRL</span></div>
+          <div class="cover-bar"></div>
+          <div class="cover-author">Vinky K</div>
+        </div>
+      </div>
+      <div class="book-shadow"></div>
+      <div class="ftag ftag1">// identity.unknown</div>
+      <div class="ftag ftag2">eclipse.init() →</div>
+    </div>
+  </div>
+</section>
+
+<!-- STRIP -->
+<div class="strip reveal">
+  <div class="strip-item"><span class="strip-val">2025</span><span class="strip-label">Published</span></div>
+  <div class="strip-item"><span class="strip-val">AI/TH</span><span class="strip-label">Genre</span></div>
+  <div class="strip-item"><span class="strip-val">?</span><span class="strip-label">Her Identity</span></div>
+  <div class="strip-item"><span class="strip-val">∞</span><span class="strip-label">Twists</span></div>
+</div>
+
+<!-- SYNOPSIS -->
+<section id="synopsis">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Synopsis</div>
+    <div class="sec-title glitch" data-text="THE STORY">THE <span>STORY</span></div>
+  </div>
+  <div class="synopsis-layout">
+    <div>
+      <div class="synopsis-text reveal">
+        <p>In a bustling world dominated by technology, <strong>Prisha Verma</strong> stands out — not just for her unparalleled coding skills, but for the enigma she carries. A young woman with a mind as sharp as her wit, she rises through the ranks of TechNovva Solutions, solving impossible challenges and winning hearts.</p>
+        <p>But beneath her brilliance lies a secret that could shatter everything. When a covert organisation known as <strong>Eclipse</strong> surfaces, threatening to upend the tech world, Prisha is drawn into a web of deceit, betrayal, and danger.</p>
+        <p>Her closest allies, Varun and Niya, find themselves questioning everything they know about her as the line between humanity and technology begins to blur.</p>
+        <p>Who is Prisha Verma? A prodigy? A creation? A saviour? As friendships are tested, truths unravel, and lives hang in the balance, <em>The Coder Girl</em> delivers a gripping tale of innovation, identity, and the boundaries of artificial intelligence.</p>
+      </div>
+      <div class="tags reveal">
+        <span class="tag g">#AI</span><span class="tag g">#Identity</span><span class="tag g">#Thriller</span>
+        <span class="tag">#TechNovva</span><span class="tag">#Eclipse</span><span class="tag">#Betrayal</span><span class="tag">#WhatIsHuman</span>
+      </div>
+    </div>
+    <div>
+      <div class="quote-block reveal">
+        "Prepare for a story that challenges the meaning of being human, with twists that will leave you questioning reality until the very last page."
+        <cite>— The Coder Girl</cite>
+      </div>
+      <div class="warning-box reveal">
+        <div class="wb-label">⚠ system alert</div>
+        <p>And just when you think it's over… <strong>the story is far from finished.</strong></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CHARACTERS -->
+<section class="chars-bg" id="characters">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Key Characters</div>
+    <div class="sec-title">MEET THE <span>PLAYERS</span></div>
+  </div>
+  <div class="chars-grid">
+    <div class="char-card reveal">
+      <div class="char-id">SUBJECT_001</div>
+      <div class="char-name">PRISHA VERMA</div>
+      <div class="char-role">The Coder Girl · TechNovva Solutions</div>
+      <div class="char-desc">A brilliant programmer with unmatched skills and an enigma no one can crack. Rises through the ranks — but who, or what, is she really?</div>
+      <span class="char-status unknown">IDENTITY: UNKNOWN</span>
+    </div>
+    <div class="char-card reveal">
+      <div class="char-id">SUBJECT_002</div>
+      <div class="char-name">VARUN</div>
+      <div class="char-role">Closest Ally · Loyalties Tested</div>
+      <div class="char-desc">Prisha's most trusted companion. His certainty about who she is begins to fracture as dangerous truths surface one by one.</div>
+      <span class="char-status ally">STATUS: ALLY [UNCERTAIN]</span>
+    </div>
+    <div class="char-card reveal">
+      <div class="char-id">SUBJECT_003</div>
+      <div class="char-name">NIYA</div>
+      <div class="char-role">Friend · Doubter · Seeker</div>
+      <div class="char-desc">Caught between loyalty and a truth too dangerous to ignore. She may be the only one willing to face what Prisha really is.</div>
+      <span class="char-status threat">STATUS: VOLATILE</span>
+    </div>
+  </div>
+</section>
+
+<!-- BUY -->
+<section class="buy-sec" id="buy">
+  <div class="buy-inner">
+    <div class="sec-eyebrow" style="justify-content:center;margin-bottom:.5rem;">Get Your Copy</div>
+    <div class="sec-title reveal" style="text-align:center;">ACQUIRE <span>THE FILE</span></div>
+    <div class="buy-terminal reveal">
+      <div class="buy-cmd">get book --title "the-coder-girl" --author "vinky-k"</div>
+      <div class="buy-output">
+        ✓ Found: The Coder Girl by Vinky K<br>
+        ✓ Available: Amazon IN · Flipkart<br>
+        ✓ Format: Paperback · Digital<br>
+        → Select your platform below
+      </div>
+    </div>
+    <div class="buy-btns reveal">
+      <a href="https://www.amazon.in/Coder-Girl-Vinky/dp/B0FJK427TR" target="_blank" class="btn btn-green" style="padding:1rem 2rem;">🛒 Buy on Amazon India</a>
+      <a href="https://www.flipkart.com/the-coder-girl/p/itm7733293d65a31" target="_blank" class="btn btn-amber" style="padding:1rem 2rem;">🛍 Buy on Flipkart</a>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section id="reviews">
+  <div class="sec-header">
+    <div class="sec-eyebrow">Reader Reviews</div>
+    <div class="sec-title">WHAT <span>READERS SAY</span></div>
+  </div>
+  <div class="reviews-grid">
+    <div class="review-card reveal">
+      <div class="review-stars">★★★★★</div>
+      <div class="review-text">"A page-turner from start to finish. The twists kept me guessing right until the last page — and then some!"</div>
+      <div class="review-by">— Amazon Reviewer</div>
+    </div>
+    <div class="review-card reveal">
+      <div class="review-stars">★★★★★</div>
+      <div class="review-text">"Prisha is one of the most compelling protagonists I've read in years. You're never quite sure who to trust."</div>
+      <div class="review-by">— Goodreads Reader</div>
+    </div>
+    <div class="review-card reveal">
+      <div class="review-stars">★★★★★</div>
+      <div class="review-text">"A bold debut. Vinky K blends tech thriller and identity drama seamlessly. Highly recommended!"</div>
+      <div class="review-by">— Flipkart Reviewer</div>
+    </div>
+  </div>
+  <p style="font-size:12px;color:var(--muted);margin-top:1.5rem;" class="reveal">
+    Read it? <a href="https://www.amazon.in/Coder-Girl-Vinky/dp/B0FJK427TR" target="_blank" style="color:var(--green);text-decoration:none;">Leave a review on Amazon →</a>
+  </p>
+</section>
+
+<!-- MORE BY AUTHOR -->
+<section style="background:var(--bg2);border-top:1px solid var(--border);">
+  <div class="sec-header">
+    <div class="sec-eyebrow">More from Vinky K</div>
+    <div class="sec-title">ALSO BY <span>THE AUTHOR</span></div>
+  </div>
+  <div class="also-card reveal">
+    <div class="also-icon">📖</div>
+    <div>
+      <div class="also-label">Next Release — Coming Soon</div>
+      <div class="also-name">Untitled · Vinky K</div>
+    </div>
+  </div>
+  <div style="margin-top:1.5rem;" class="reveal">
+    <a href="index.html#books" class="btn btn-outline">View All Books →</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a class="footer-logo" href="index.html">VK.EXE // VINKY K</a>
+  <span class="footer-copy">© 2025 Vinky K. All rights reserved.</span>
+  <div class="footer-links">
+    <a href="https://www.amazon.in/Coder-Girl-Vinky/dp/B0FJK427TR" target="_blank">Amazon</a>
+    <a href="https://www.flipkart.com/the-coder-girl/p/itm7733293d65a31" target="_blank">Flipkart</a>
+    <a href="index.html">Author Home</a>
+  </div>
+</footer>
+
+<script>
+// Matrix rain
+const canvas = document.getElementById('matrix');
+const ctx = canvas.getContext('2d');
+function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+resizeCanvas();
+window.addEventListener('resize',resizeCanvas);
+const chars='01アイウエオカキクケコサシスセソタチツテトナニヌネノ';
+const cols=Math.floor(canvas.width/18);
+const drops=Array(cols).fill(1);
+function drawMatrix(){
+  ctx.fillStyle='rgba(2,12,2,0.05)';
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle='#00ff41';
+  ctx.font='14px Share Tech Mono';
+  drops.forEach((y,i)=>{
+    const char=chars[Math.floor(Math.random()*chars.length)];
+    ctx.fillText(char,i*18,y*18);
+    if(y*18>canvas.height&&Math.random()>.975)drops[i]=0;
+    drops[i]++;
+  });
+}
+setInterval(drawMatrix,50);
+
+// Cursor
+const cur=document.getElementById('cursor');
+document.addEventListener('mousemove',e=>{cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px';});
+
+// Scroll reveal
+const obs=new IntersectionObserver(entries=>entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a=>{
+  a.addEventListener('click',e=>{
+    const t=document.querySelector(a.getAttribute('href'));
+    if(t){e.preventDefault();t.scrollIntoView({behavior:'smooth'});}
+  });
+});
+</script>
+</body>
+</html>
