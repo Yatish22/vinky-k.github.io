@@ -86,159 +86,185 @@ nav.scrolled{background:rgba(253,246,232,.97);backdrop-filter:blur(12px);box-sha
 @keyframes sp{0%,100%{transform:scaleY(1);}50%{transform:scaleY(1.3);}}
 
 /* ══════════════════════════════════════
-   BOOK ANIMATION SYSTEM (SIDE-BY-SIDE FIXED)
+   TRUE 3D BOOK FLIP ANIMATION
 ══════════════════════════════════════ */
 .ob-scene {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
   width: 100%;
 }
 
-.ob-closed {
+.book-stage {
+  perspective: 1400px;
+  width: 440px;
+  height: 300px;
   position: relative;
-  width: 210px;
-  cursor: pointer;
-  transition: transform .3s ease, box-shadow .3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
-.ob-closed:hover { transform: translateY(-5px); }
 
-.ob-cover-front {
-  width: 210px;
-  height: 290px;
-  border-radius: 2px 10px 10px 2px;
-  background: linear-gradient(160deg,#1a100a,#2d1f0f,#3d2a10);
+.book-3d {
   position: relative;
+  width: 440px;
+  height: 300px;
+  transform-style: preserve-3d;
+  /* Centered offset when closed so it looks like a single book */
+  transform: translateX(110px);
+  transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.book-3d.open {
+  transform: translateX(0);
+}
+
+/* Spine */
+.book-spine {
+  position: absolute;
+  left: 214px;
+  top: 0;
+  width: 12px;
+  height: 100%;
+  background: linear-gradient(90deg, #100a06, #2d1f0f 40%, #3d2a10 60%, #100a06);
+  border-left: 1px solid rgba(184,137,42,0.3);
+  border-right: 1px solid rgba(184,137,42,0.3);
+  z-index: 20;
+}
+
+/* RIGHT BASE PAGE (About the Author) */
+.page-right {
+  position: absolute;
+  left: 220px;
+  top: 0;
+  width: 220px;
+  height: 100%;
+  background: linear-gradient(to left, #ede2c5, #f8f0dc);
+  border: 1px solid var(--border);
+  border-left: none;
+  border-radius: 0 4px 4px 0;
+  box-shadow: 6px 15px 35px rgba(26,18,8,0.18);
   overflow: hidden;
-  box-shadow: -7px 3px 18px rgba(26,18,8,.65), 0 14px 36px rgba(26,18,8,.4), inset 0 0 0 1px rgba(184,137,42,.12);
+  z-index: 5;
+}
+.page-right::before {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; left: 0; width: 20px;
+  background: linear-gradient(to left, transparent, rgba(26,18,8,0.09));
+  pointer-events: none;
+}
+
+/* LEFT BASE PAGE (Static paper surface behind the flipped page) */
+.page-left-base {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 220px;
+  height: 100%;
+  background: linear-gradient(to right, #e8ddbf, #f4ecd6);
+  border: 1px solid var(--border);
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+  z-index: 2;
+  box-shadow: -6px 15px 35px rgba(26,18,8,0.18);
+}
+
+/* ROTATING COVER FLAP (Transforms from closed on the right to open on the left) */
+.cover-flap {
+  position: absolute;
+  left: 220px; /* Pivots from center spine */
+  top: 0;
+  width: 220px;
+  height: 100%;
+  transform-origin: left center;
+  transform-style: preserve-3d;
+  transform: rotateY(0deg);
+  transition: transform 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 30;
+  cursor: pointer;
+}
+
+.book-3d.open .cover-flap {
+  transform: rotateY(-180deg);
+}
+
+/* FRONT OF COVER */
+.cover-face-front {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  border-radius: 2px 8px 8px 2px;
+  background: linear-gradient(160deg, #1a100a, #2d1f0f 55%, #3d2a10);
+  box-shadow: 0 14px 35px rgba(26,18,8,0.5), inset 0 0 0 1px rgba(184,137,42,0.18);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   padding: 1.5rem;
-  animation: closedFloat 4s ease-in-out infinite;
+  overflow: hidden;
 }
-@keyframes closedFloat { 0%,100%{transform:rotateY(-5deg) translateY(0);} 50%{transform:rotateY(-2deg) translateY(-3px);} }
+.cover-pattern {
+  position: absolute; inset: 0; opacity: .07;
+  background: repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(184,137,42,.5) 10px,rgba(184,137,42,.5) 11px);
+}
+.cover-border {
+  position: absolute; inset: 9px; border: 1px solid rgba(184,137,42,.28); border-radius: 1px; pointer-events: none;
+}
+.cover-content { position: relative; z-index: 2; text-align: center; }
+.cover-ornament { font-size: 1.4rem; color: var(--gold); opacity: .7; display: block; margin-bottom: .3rem; }
+.cover-initial { font-family: var(--font-serif); font-size: 4.2rem; color: var(--gold); font-style: italic; line-height: 1; display: block; }
+.cover-div { width: 50px; height: 1px; background: linear-gradient(90deg,transparent,var(--gold),transparent); margin: .5rem auto; opacity: .45; }
+.cover-author { font-family: var(--font-serif); font-size: .75rem; color: rgba(253,246,232,.5); letter-spacing: .2em; text-transform: uppercase; }
+.cover-genre { font-family: var(--font-mono); font-size: .52rem; color: rgba(184,137,42,.5); letter-spacing: .15em; text-transform: uppercase; margin-top: 3px; }
+.cover-year { position: absolute; bottom: .8rem; left: 0; right: 0; font-family: var(--font-mono); font-size: .45rem; letter-spacing: .12em; color: rgba(184,137,42,.35); text-transform: uppercase; text-align: center; }
 
-.ob-cover-shadow {
+/* BACK OF COVER (Becomes the Left Page with reviews when flipped) */
+.cover-face-back {
   position: absolute;
-  bottom: -14px; left: 5px; right: -5px;
-  height: 14px;
-  background: radial-gradient(ellipse,rgba(26,18,8,.3),transparent 70%);
-  filter: blur(6px);
-}
-.ob-cover-spine { position: absolute; left: -9px; top: 0; bottom: 0; width: 9px; background: linear-gradient(180deg,#0d0806,#1a100a,#0d0806); border-radius: 2px 0 0 2px; box-shadow: -2px 0 6px rgba(0,0,0,.5); }
-.ob-cover-border { position: absolute; inset: 9px; border: 1px solid rgba(184,137,42,.28); border-radius: 1px; pointer-events: none; }
-.ob-cover-border::before { content: ''; position: absolute; inset: 5px; border: 1px solid rgba(184,137,42,.1); border-radius: 1px; }
-.ob-cover-pattern { position: absolute; inset: 0; opacity: .07; background: repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(184,137,42,.5) 10px,rgba(184,137,42,.5) 11px); }
-.ob-cover-sheen { position: absolute; inset: 0; background: linear-gradient(135deg,rgba(255,255,255,.05) 0%,transparent 50%,rgba(0,0,0,.08) 100%); pointer-events: none; }
-.ob-cover-content { position: relative; z-index: 2; text-align: center; }
-.ob-cover-ornament { font-size: 1.4rem; color: var(--gold); opacity: .65; display: block; margin-bottom: .4rem; }
-.ob-cover-initial { font-family: var(--font-serif); font-size: 4rem; color: var(--gold); opacity: .85; font-style: italic; line-height: 1; display: block; }
-.ob-cover-divider { width: 50px; height: 1px; background: linear-gradient(90deg,transparent,var(--gold),transparent); margin: .6rem auto; opacity: .45; }
-.ob-cover-name { font-family: var(--font-serif); font-size: .7rem; color: rgba(253,246,232,.45); letter-spacing: .2em; text-transform: uppercase; display: block; margin-bottom: .15rem; }
-.ob-cover-role { font-family: var(--font-mono); font-size: .5rem; color: rgba(184,137,42,.45); letter-spacing: .15em; text-transform: uppercase; display: block; }
-.ob-cover-year { position: absolute; bottom: .85rem; left: 0; right: 0; font-family: var(--font-mono); font-size: .45rem; letter-spacing: .12em; color: rgba(184,137,42,.3); text-transform: uppercase; text-align: center; }
-.ob-closed-hint { font-family: var(--font-mono); font-size: 10px; letter-spacing: .14em; color: var(--gold); text-transform: uppercase; display: flex; align-items: center; gap: .4rem; animation: hintPulse 2s ease-in-out infinite; cursor: pointer; }
-@keyframes hintPulse { 0%,100%{opacity:.45;} 50%{opacity:1;} }
-
-/* SPREAD (2-PAGE CONTAINER) */
-.ob-open-wrap { display: none; }
-.ob-open-wrap.show { display: flex; flex-direction: column; align-items: center; gap: .75rem; }
-
-.ob-spread {
-  position: relative;
-  display: flex;
-  width: 440px;
-  height: 290px;
-  box-shadow: 0 20px 45px rgba(26,18,8,.25);
-  border-radius: 4px;
-}
-
-/* LEFT PAGE (Reviews) */
-.ob-page-left {
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(to right,#ede2c5,#f8f0dc);
+  inset: 0;
+  backface-visibility: hidden;
+  transform: rotateY(180deg);
+  background: linear-gradient(to right, #ede2c5, #f8f0dc);
   border: 1px solid var(--border);
   border-right: none;
   border-radius: 4px 0 0 4px;
-  position: relative;
   overflow: hidden;
-  z-index: 1;
+  box-shadow: -6px 15px 35px rgba(26,18,8,0.2);
 }
-.ob-page-left::after {
+.cover-face-back::after {
   content: '';
   position: absolute;
-  top: 0; bottom: 0; right: 0; width: 16px;
-  background: linear-gradient(to right, transparent, rgba(26,18,8,.08));
+  top: 0; bottom: 0; right: 0; width: 18px;
+  background: linear-gradient(to right, transparent, rgba(26,18,8,0.09));
   pointer-events: none;
 }
 
-/* CENTER SPINE */
-.ob-spine-open {
-  width: 12px;
-  height: 100%;
-  background: linear-gradient(90deg,#1a100a,#2d1f0f 40%,#3d2a10 60%,#2d1f0f 80%,#1a100a);
-  border-left: 1px solid rgba(184,137,42,.2);
-  border-right: 1px solid rgba(184,137,42,.2);
-  z-index: 5;
-  flex-shrink: 0;
-}
-
-/* RIGHT PAGE (About Author) */
-.ob-page-right {
-  width: 50%;
-  height: 100%;
-  background: linear-gradient(to left,#ede2c5,#f8f0dc);
-  border: 1px solid var(--border);
-  border-left: none;
-  border-radius: 0 4px 4px 0;
-  position: relative;
-  overflow: hidden;
-  z-index: 1;
-}
-.ob-page-right::before {
-  content: '';
-  position: absolute;
-  top: 0; bottom: 0; left: 0; width: 16px;
-  background: linear-gradient(to left, transparent, rgba(26,18,8,.08));
-  pointer-events: none;
-}
-
-/* Reviews Left Page Content */
+/* Page Contents */
 .ob-lp-reviews {
-  width: 100%;
-  height: 100%;
+  width: 100%; height: 100%;
   padding: 1.2rem 1.1rem 1rem;
-  display: flex;
-  flex-direction: column;
+  display: flex; flex-direction: column;
 }
-.ob-lp-review-header { display: flex; align-items: center; gap: .5rem; margin-bottom: .5rem; }
+.ob-lp-review-header { display: flex; align-items: center; gap: .5rem; margin-bottom: .45rem; }
 .ob-lp-stars { color: var(--gold); font-size: 11px; letter-spacing: 2px; }
 .ob-lp-rtag { font-family: var(--font-mono); font-size: 7.5px; letter-spacing: .15em; color: var(--muted); text-transform: uppercase; }
-.ob-lp-header-rule { width: 100%; height: 1px; background: linear-gradient(90deg,var(--gold),transparent); margin-bottom: .65rem; opacity: .3; }
-
+.ob-lp-header-rule { width: 100%; height: 1px; background: linear-gradient(90deg,var(--gold),transparent); margin-bottom: .6rem; opacity: .3; }
 .ob-lp-rv-list { position: relative; flex: 1; min-height: 95px; }
 .ob-lp-rv { position: absolute; inset: 0; opacity: 0; transition: opacity .5s ease; pointer-events: none; }
 .ob-lp-rv.active { opacity: 1; pointer-events: auto; }
 .ob-lp-rv-text { font-family: var(--font-serif); font-style: italic; font-size: .75rem; color: var(--ink2); line-height: 1.7; margin-bottom: .5rem; }
 .ob-lp-rv-auth { font-family: var(--font-mono); font-size: .58rem; color: var(--gold); letter-spacing: .08em; }
-
 .ob-lp-dots { display: flex; gap: .35rem; margin-top: .4rem; }
 .ob-lp-dot { width: 16px; height: 2px; background: rgba(26,18,8,.15); cursor: pointer; transition: background .3s, width .3s; }
 .ob-lp-dot.active { background: var(--gold); width: 24px; }
-.ob-lp-footer { font-family: var(--font-serif); font-style: italic; font-size: .68rem; color: rgba(26,18,8,.35); width: 100%; text-align: center; border-top: 1px solid rgba(184,137,42,.15); padding-top: .45rem; margin-top: .4rem; }
+.ob-lp-footer { font-family: var(--font-serif); font-style: italic; font-size: .68rem; color: rgba(26,18,8,.35); width: 100%; text-align: center; border-top: 1px solid rgba(184,137,42,.15); padding-top: .4rem; margin-top: .35rem; }
 
-/* Right Page Content */
 .ob-rp-content {
   height: 100%;
-  padding: 1.2rem 1.2rem 1rem 1.3rem;
-  display: flex;
-  flex-direction: column;
-  position: relative;
-  z-index: 2;
+  padding: 1.2rem 1.2rem 1rem 1.4rem;
+  display: flex; flex-direction: column;
+  position: relative; z-index: 2;
 }
 .ob-r-chapter { font-family: var(--font-mono); font-size: 8px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-bottom: .35rem; }
 .ob-r-rule { height: 1px; background: linear-gradient(90deg,var(--gold),transparent); margin-bottom: .5rem; opacity: .35; }
@@ -261,9 +287,26 @@ nav.scrolled{background:rgba(253,246,232,.97);backdrop-filter:blur(12px);box-sha
 .ob-r-quote.lit { opacity: 1; }
 .ob-r-pagenum { font-family: var(--font-mono); font-size: 7px; color: var(--muted); letter-spacing: .1em; text-align: center; margin-top: .25rem; opacity: .35; }
 
-.ob-open-shadow { width: 420px; height: 14px; margin-top: -3px; background: radial-gradient(ellipse,rgba(26,18,8,.2),transparent 70%); filter: blur(6px); }
-.ob-close-hint { font-family: var(--font-mono); font-size: 9px; letter-spacing: .14em; color: var(--muted); text-transform: uppercase; opacity: .5; cursor: pointer; transition: opacity .2s; margin-top: .3rem; }
-.ob-close-hint:hover { opacity: .9; color: var(--gold); }
+.book-controls {
+  margin-top: 1.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .5rem;
+}
+.hint-toggle {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: .14em;
+  color: var(--gold);
+  text-transform: uppercase;
+  cursor: pointer;
+  background: none;
+  border: none;
+  outline: none;
+  transition: opacity .2s, transform .2s;
+}
+.hint-toggle:hover { opacity: .75; transform: scale(1.03); }
 
 /* REST OF PAGE STYLES */
 .genre-strip{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--paper2);}
@@ -487,8 +530,12 @@ nav.scrolled{background:rgba(253,246,232,.97);backdrop-filter:blur(12px);box-sha
   .s2-books{display:none;}
   body{cursor:auto;}
   .cur-dot,.cur-ring{display:none;}
-  .ob-spread{width:320px;height:230px;}
-  .ob-open-shadow{width:300px;}
+  .book-stage{width:320px;height:230px;}
+  .book-3d{width:320px;height:230px;transform:translateX(80px);}
+  .book-spine{left:154px;}
+  .page-right{left:160px;width:160px;}
+  .page-left-base{width:160px;}
+  .cover-flap{left:160px;width:160px;}
 }
 </style>
 </head>
@@ -617,69 +664,19 @@ nav.scrolled{background:rgba(253,246,232,.97);backdrop-filter:blur(12px);box-sha
   </div>
 
   <div class="hero-right">
-    <!-- BOOK ANIMATION CONTAINER -->
-    <div class="ob-scene" id="authorBook">
-
-      <!-- CLOSED BOOK -->
-      <div class="ob-closed" id="obClosed" onclick="openBook()">
-        <div class="ob-cover-front">
-          <div class="ob-cover-spine"></div>
-          <div class="ob-cover-pattern"></div>
-          <div class="ob-cover-border"></div>
-          <div class="ob-cover-sheen"></div>
-          <div class="ob-cover-content">
-            <span class="ob-cover-ornament">✦</span>
-            <span class="ob-cover-initial">V</span>
-            <div class="ob-cover-divider"></div>
-            <span class="ob-cover-name">Vinky K.</span>
-            <span class="ob-cover-role">Author · Mystery &amp; Thriller</span>
-          </div>
-          <div class="ob-cover-year">Est. 2025 · The Coder Girl Series</div>
-        </div>
-        <div class="ob-cover-shadow"></div>
-      </div>
-      <div class="ob-closed-hint" id="obClosedHint" onclick="openBook()">✦ &nbsp;Click to open&nbsp; ✦</div>
-
-      <!-- OPEN BOOK SPREAD -->
-      <div class="ob-open-wrap" id="obOpenWrap">
-        <div class="ob-spread" id="obSpread">
+    <!-- 3D FLIPPING BOOK STAGE -->
+    <div class="ob-scene">
+      <div class="book-stage">
+        <div class="book-3d" id="book3d">
           
-          <!-- LEFT PAGE: REVIEWS -->
-          <div class="ob-page-left">
-            <div class="ob-lp-reviews">
-              <div class="ob-lp-review-header">
-                <span class="ob-lp-stars">★★★★★</span>
-                <span class="ob-lp-rtag">Reader Reviews</span>
-              </div>
-              <div class="ob-lp-header-rule"></div>
-              <div class="ob-lp-rv-list">
-                <div class="ob-lp-rv active">
-                  <div class="ob-lp-rv-text">"A page-turner from the very first chapter. The twists kept me guessing until the very last page — and then some!"</div>
-                  <div class="ob-lp-rv-auth">— Verified Reader · Amazon India</div>
-                </div>
-                <div class="ob-lp-rv">
-                  <div class="ob-lp-rv-text">"Prisha is one of the most compelling protagonists I've read in years. You never know who to trust."</div>
-                  <div class="ob-lp-rv-auth">— Verified Reader · Goodreads</div>
-                </div>
-                <div class="ob-lp-rv">
-                  <div class="ob-lp-rv-text">"Bold debut. Vinky K blends tech thriller and identity drama in a way that feels completely fresh."</div>
-                  <div class="ob-lp-rv-auth">— Verified Reader · Flipkart</div>
-                </div>
-              </div>
-              <div class="ob-lp-dots">
-                <span class="ob-lp-dot active" onclick="goLpReview(0)"></span>
-                <span class="ob-lp-dot" onclick="goLpReview(1)"></span>
-                <span class="ob-lp-dot" onclick="goLpReview(2)"></span>
-              </div>
-              <div class="ob-lp-footer">❧ &nbsp;Vinky K. &nbsp;❧</div>
-            </div>
-          </div>
+          <!-- Static left page paper under flap -->
+          <div class="page-left-base"></div>
 
-          <!-- CENTER BOOK SPINE -->
-          <div class="ob-spine-open"></div>
+          <!-- Central Book Spine -->
+          <div class="book-spine"></div>
 
-          <!-- RIGHT PAGE: ABOUT AUTHOR -->
-          <div class="ob-page-right" id="obPageR">
+          <!-- RIGHT PAGE (Always visible about author) -->
+          <div class="page-right">
             <div class="ob-rp-content">
               <div class="ob-r-chapter">About the Author</div>
               <div class="ob-r-rule"></div>
@@ -697,11 +694,60 @@ nav.scrolled{background:rgba(253,246,232,.97);backdrop-filter:blur(12px);box-sha
             </div>
           </div>
 
+          <!-- ROTATING 3D FRONT COVER -->
+          <div class="cover-flap" id="coverFlap" onclick="toggleBook()">
+            <!-- Front face: Book Cover -->
+            <div class="cover-face-front">
+              <div class="cover-pattern"></div>
+              <div class="cover-border"></div>
+              <div class="cover-content">
+                <span class="cover-ornament">✦</span>
+                <span class="cover-initial">V</span>
+                <div class="cover-div"></div>
+                <div class="cover-author">Vinky K.</div>
+                <div class="cover-genre">Author · Mystery &amp; Thriller</div>
+              </div>
+              <div class="cover-year">Est. 2025 · The Coder Girl Series</div>
+            </div>
+
+            <!-- Back face: Becomes Left Page when rotated -180deg -->
+            <div class="cover-face-back">
+              <div class="ob-lp-reviews">
+                <div class="ob-lp-review-header">
+                  <span class="ob-lp-stars">★★★★★</span>
+                  <span class="ob-lp-rtag">Reader Reviews</span>
+                </div>
+                <div class="ob-lp-header-rule"></div>
+                <div class="ob-lp-rv-list">
+                  <div class="ob-lp-rv active">
+                    <div class="ob-lp-rv-text">"A page-turner from the very first chapter. The twists kept me guessing until the very last page — and then some!"</div>
+                    <div class="ob-lp-rv-auth">— Verified Reader · Amazon India</div>
+                  </div>
+                  <div class="ob-lp-rv">
+                    <div class="ob-lp-rv-text">"Prisha is one of the most compelling protagonists I've read in years. You never know who to trust."</div>
+                    <div class="ob-lp-rv-auth">— Verified Reader · Goodreads</div>
+                  </div>
+                  <div class="ob-lp-rv">
+                    <div class="ob-lp-rv-text">"Bold debut. Vinky K blends tech thriller and identity drama in a way that feels completely fresh."</div>
+                    <div class="ob-lp-rv-auth">— Verified Reader · Flipkart</div>
+                  </div>
+                </div>
+                <div class="ob-lp-dots">
+                  <span class="ob-lp-dot active" onclick="event.stopPropagation(); goLpReview(0)"></span>
+                  <span class="ob-lp-dot" onclick="event.stopPropagation(); goLpReview(1)"></span>
+                  <span class="ob-lp-dot" onclick="event.stopPropagation(); goLpReview(2)"></span>
+                </div>
+                <div class="ob-lp-footer">❧ &nbsp;Vinky K. &nbsp;❧</div>
+              </div>
+            </div>
+          </div>
+
         </div>
-        <div class="ob-open-shadow"></div>
-        <div class="ob-close-hint" onclick="closeBook()">✕ Close book</div>
       </div>
 
+      <div class="book-controls">
+        <button class="hint-toggle" id="bookToggleBtn" onclick="toggleBook()">✦ &nbsp;Click to open&nbsp; ✦</button>
+      </div>
     </div>
   </div>
 
@@ -877,9 +923,7 @@ window.addEventListener('scroll',()=>nav.classList.toggle('scrolled',window.scro
 const obs=new IntersectionObserver(e=>e.forEach(en=>{if(en.isIntersecting)en.target.classList.add('visible');}),{threshold:.1});
 document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
 
-// ═══════════════════════════════════════════
-// LEFT PAGE REVIEW ROTATOR
-// ═══════════════════════════════════════════
+// Left Page Review Rotator
 var lpReviewIdx = 0;
 var lpReviewTimer;
 
@@ -900,73 +944,48 @@ function startLpRotator(){
 }
 
 // ═══════════════════════════════════════════
-// BOOK ANIMATION (SIDE-BY-SIDE FIXED)
+// TRUE 3D BOOK FLIP LOGIC
 // ═══════════════════════════════════════════
-function openBook(){
-  var closed = document.getElementById('obClosed');
-  var hint   = document.getElementById('obClosedHint');
-  var wrap   = document.getElementById('obOpenWrap');
-  var quote  = document.getElementById('obQuote');
+var isBookOpen = false;
 
-  if(!closed || !wrap) return;
+function toggleBook(){
+  var book = document.getElementById('book3d');
+  var btn  = document.getElementById('bookToggleBtn');
+  var quote = document.getElementById('obQuote');
+  var lineIds = ['rl1','rl2','rl3','rl5','rl6'];
 
-  // 1. Smoothly fade out closed cover
-  closed.style.transition = 'opacity .3s, transform .3s';
-  closed.style.opacity    = '0';
-  closed.style.transform  = 'scale(.92) translateY(-8px)';
-  hint.style.transition   = 'opacity .2s';
-  hint.style.opacity      = '0';
+  if(!isBookOpen){
+    // OPEN ANIMATION
+    isBookOpen = true;
+    book.classList.add('open');
+    btn.innerHTML = '✕ &nbsp;Close Book';
 
-  setTimeout(function(){
-    closed.style.display = 'none';
-    hint.style.display   = 'none';
-
-    // 2. Reveal the 2-page spread
-    wrap.classList.add('show');
-
-    // 3. Stagger-in the lines on the Right Page (Author info)
-    var lineIds = ['rl1','rl2','rl3','rl5','rl6'];
+    // Stagger in author details on right page as the cover swings open
     lineIds.forEach(function(id, i){
       setTimeout(function(){
         var el = document.getElementById(id);
         if(el) el.classList.add('lit');
-      }, 250 + (i * 150));
+      }, 500 + (i * 120));
     });
 
-    // 4. Reveal bottom quote & start reviews rotator on the Left Page
     setTimeout(function(){
       if(quote) quote.classList.add('lit');
       startLpRotator();
-    }, 1100);
-  }, 300);
-}
+    }, 1200);
 
-function closeBook(){
-  var closed = document.getElementById('obClosed');
-  var hint   = document.getElementById('obClosedHint');
-  var wrap   = document.getElementById('obOpenWrap');
-  var quote  = document.getElementById('obQuote');
+  } else {
+    // CLOSE ANIMATION
+    isBookOpen = false;
+    book.classList.remove('open');
+    btn.innerHTML = '✦ &nbsp;Click to open&nbsp; ✦';
+    clearInterval(lpReviewTimer);
 
-  if(!wrap || !closed) return;
-
-  clearInterval(lpReviewTimer);
-
-  // Reset lines on right page
-  ['rl1','rl2','rl3','rl4','rl5','rl6'].forEach(function(id){
-    var el = document.getElementById(id);
-    if(el) el.classList.remove('lit');
-  });
-  if(quote) quote.classList.remove('lit');
-
-  wrap.classList.remove('show');
-  closed.style.display = '';
-  hint.style.display   = '';
-
-  setTimeout(function(){
-    closed.style.opacity   = '1';
-    closed.style.transform = '';
-    hint.style.opacity     = '';
-  }, 50);
+    lineIds.forEach(function(id){
+      var el = document.getElementById(id);
+      if(el) el.classList.remove('lit');
+    });
+    if(quote) quote.classList.remove('lit');
+  }
 }
 
 // Smooth scroll
@@ -977,7 +996,7 @@ document.querySelectorAll('a[href^="#"]').forEach(a=>{
   });
 });
 
-// POPUP SYSTEM
+// Mystery Popup System
 const popup=document.getElementById('popup');
 const s1=document.getElementById('stage1');
 const s2=document.getElementById('stage2');
