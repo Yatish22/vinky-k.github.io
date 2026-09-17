@@ -86,177 +86,184 @@ nav.scrolled{background:rgba(253,246,232,.97);backdrop-filter:blur(12px);box-sha
 @keyframes sp{0%,100%{transform:scaleY(1);}50%{transform:scaleY(1.3);}}
 
 /* ══════════════════════════════════════
-   BOOK ANIMATION SYSTEM (FIXED & COMPLETE)
+   BOOK ANIMATION SYSTEM (SIDE-BY-SIDE FIXED)
 ══════════════════════════════════════ */
-.ob-scene{
-  display:flex;flex-direction:column;align-items:center;gap:1rem;
-  width:100%;
-}
-.ob-closed{
-  position:relative;width:200px;cursor:pointer;
-  transition:transform .3s,box-shadow .3s;
-}
-.ob-closed:hover{transform:translateY(-5px);}
-.ob-cover-front{
-  width:200px;height:280px;
-  border-radius:2px 10px 10px 2px;
-  background:linear-gradient(160deg,#1a100a,#2d1f0f,#3d2a10);
-  position:relative;overflow:hidden;
-  box-shadow:-7px 3px 18px rgba(26,18,8,.65),0 14px 36px rgba(26,18,8,.4),inset 0 0 0 1px rgba(184,137,42,.12);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;padding:1.5rem;
-  animation:closedFloat 4s ease-in-out infinite;
-}
-@keyframes closedFloat{0%,100%{transform:rotateY(-5deg) translateY(0);}50%{transform:rotateY(-2deg) translateY(-3px);}}
-.ob-cover-shadow{
-  position:absolute;bottom:-14px;left:5px;right:-5px;
-  height:14px;
-  background:radial-gradient(ellipse,rgba(26,18,8,.3),transparent 70%);
-  filter:blur(6px);
-}
-.ob-cover-spine{position:absolute;left:-9px;top:0;bottom:0;width:9px;background:linear-gradient(180deg,#0d0806,#1a100a,#0d0806);border-radius:2px 0 0 2px;box-shadow:-2px 0 6px rgba(0,0,0,.5);}
-.ob-cover-border{position:absolute;inset:9px;border:1px solid rgba(184,137,42,.28);border-radius:1px;pointer-events:none;}
-.ob-cover-border::before{content:'';position:absolute;inset:5px;border:1px solid rgba(184,137,42,.1);border-radius:1px;}
-.ob-cover-pattern{position:absolute;inset:0;opacity:.07;background:repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(184,137,42,.5) 10px,rgba(184,137,42,.5) 11px),repeating-linear-gradient(-45deg,transparent,transparent 10px,rgba(184,137,42,.3) 10px,rgba(184,137,42,.3) 11px);}
-.ob-cover-sheen{position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.05) 0%,transparent 50%,rgba(0,0,0,.08) 100%);border-radius:2px 10px 10px 2px;pointer-events:none;}
-.ob-cover-content{position:relative;z-index:2;text-align:center;}
-.ob-cover-ornament{font-size:1.4rem;color:var(--gold);opacity:.65;display:block;margin-bottom:.4rem;text-shadow:0 0 10px rgba(184,137,42,.4);}
-.ob-cover-initial{font-family:var(--font-serif);font-size:4rem;color:var(--gold);opacity:.85;font-style:italic;line-height:1;text-shadow:0 0 24px rgba(184,137,42,.35);display:block;}
-.ob-cover-divider{width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:.6rem auto;opacity:.45;}
-.ob-cover-name{font-family:var(--font-serif);font-size:.7rem;color:rgba(253,246,232,.45);letter-spacing:.2em;text-transform:uppercase;display:block;margin-bottom:.15rem;}
-.ob-cover-role{font-family:var(--font-mono);font-size:.5rem;color:rgba(184,137,42,.45);letter-spacing:.15em;text-transform:uppercase;display:block;}
-.ob-cover-year{position:absolute;bottom:.85rem;left:0;right:0;font-family:var(--font-mono);font-size:.45rem;letter-spacing:.12em;color:rgba(184,137,42,.3);text-transform:uppercase;text-align:center;}
-.ob-closed-hint{font-family:var(--font-mono);font-size:10px;letter-spacing:.14em;color:var(--gold);text-transform:uppercase;display:flex;align-items:center;gap:.4rem;animation:hintPulse 2s ease-in-out infinite;cursor:pointer;}
-@keyframes hintPulse{0%,100%{opacity:.45;}50%{opacity:1;}}
-
-/* ── OPEN BOOK SPREAD ── */
-.ob-open-wrap{display:none;}
-.ob-open-wrap.show{display:flex;flex-direction:column;align-items:center;gap:.75rem;}
-
-.ob-spread{
-  position:relative;
-  display:flex;
-  width:430px;height:290px;
-  perspective:1200px;
-  filter:drop-shadow(0 20px 40px rgba(26,18,8,.25));
+.ob-scene {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
 }
 
-/* Flap wrapper (flips from right over to the left) */
-.ob-flap{
-  position:absolute;
-  left:0;
-  top:0;
-  width:215px;
-  height:100%;
-  transform-origin:right center;
-  transform-style:preserve-3d;
-  transform:rotateY(0deg);
-  transition:transform 1.4s cubic-bezier(.25,1,.5,1);
-  z-index:20;
+.ob-closed {
+  position: relative;
+  width: 210px;
+  cursor: pointer;
+  transition: transform .3s ease, box-shadow .3s ease;
 }
-.ob-flap.open{
-  transform:rotateY(-180deg);
-}
+.ob-closed:hover { transform: translateY(-5px); }
 
-.ob-flap-front{
-  position:absolute;inset:0;
-  background:linear-gradient(160deg,#1e1208,#2d1f0f,#3a2710);
-  border-radius:0 6px 6px 0;
-  backface-visibility:hidden;
-  border:1px solid rgba(184,137,42,.2);
-  display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:1.5rem;
+.ob-cover-front {
+  width: 210px;
+  height: 290px;
+  border-radius: 2px 10px 10px 2px;
+  background: linear-gradient(160deg,#1a100a,#2d1f0f,#3d2a10);
+  position: relative;
+  overflow: hidden;
+  box-shadow: -7px 3px 18px rgba(26,18,8,.65), 0 14px 36px rgba(26,18,8,.4), inset 0 0 0 1px rgba(184,137,42,.12);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: closedFloat 4s ease-in-out infinite;
 }
-.ob-flap-back{
-  position:absolute;inset:0;
-  background:linear-gradient(to right,#ede2c5,#f8f0dc);
-  border-radius:4px 0 0 4px;
-  border:1px solid var(--border);border-right:none;
-  backface-visibility:hidden;
-  transform:rotateY(180deg);
-  overflow:hidden;
-}
+@keyframes closedFloat { 0%,100%{transform:rotateY(-5deg) translateY(0);} 50%{transform:rotateY(-2deg) translateY(-3px);} }
 
-/* Gutter shadow between left page and spine */
-.ob-flap-back::after{
-  content:'';position:absolute;top:0;bottom:0;right:0;width:18px;
-  background:linear-gradient(to right,transparent,rgba(26,18,8,.1));
-  pointer-events:none;
+.ob-cover-shadow {
+  position: absolute;
+  bottom: -14px; left: 5px; right: -5px;
+  height: 14px;
+  background: radial-gradient(ellipse,rgba(26,18,8,.3),transparent 70%);
+  filter: blur(6px);
 }
+.ob-cover-spine { position: absolute; left: -9px; top: 0; bottom: 0; width: 9px; background: linear-gradient(180deg,#0d0806,#1a100a,#0d0806); border-radius: 2px 0 0 2px; box-shadow: -2px 0 6px rgba(0,0,0,.5); }
+.ob-cover-border { position: absolute; inset: 9px; border: 1px solid rgba(184,137,42,.28); border-radius: 1px; pointer-events: none; }
+.ob-cover-border::before { content: ''; position: absolute; inset: 5px; border: 1px solid rgba(184,137,42,.1); border-radius: 1px; }
+.ob-cover-pattern { position: absolute; inset: 0; opacity: .07; background: repeating-linear-gradient(45deg,transparent,transparent 10px,rgba(184,137,42,.5) 10px,rgba(184,137,42,.5) 11px); }
+.ob-cover-sheen { position: absolute; inset: 0; background: linear-gradient(135deg,rgba(255,255,255,.05) 0%,transparent 50%,rgba(0,0,0,.08) 100%); pointer-events: none; }
+.ob-cover-content { position: relative; z-index: 2; text-align: center; }
+.ob-cover-ornament { font-size: 1.4rem; color: var(--gold); opacity: .65; display: block; margin-bottom: .4rem; }
+.ob-cover-initial { font-family: var(--font-serif); font-size: 4rem; color: var(--gold); opacity: .85; font-style: italic; line-height: 1; display: block; }
+.ob-cover-divider { width: 50px; height: 1px; background: linear-gradient(90deg,transparent,var(--gold),transparent); margin: .6rem auto; opacity: .45; }
+.ob-cover-name { font-family: var(--font-serif); font-size: .7rem; color: rgba(253,246,232,.45); letter-spacing: .2em; text-transform: uppercase; display: block; margin-bottom: .15rem; }
+.ob-cover-role { font-family: var(--font-mono); font-size: .5rem; color: rgba(184,137,42,.45); letter-spacing: .15em; text-transform: uppercase; display: block; }
+.ob-cover-year { position: absolute; bottom: .85rem; left: 0; right: 0; font-family: var(--font-mono); font-size: .45rem; letter-spacing: .12em; color: rgba(184,137,42,.3); text-transform: uppercase; text-align: center; }
+.ob-closed-hint { font-family: var(--font-mono); font-size: 10px; letter-spacing: .14em; color: var(--gold); text-transform: uppercase; display: flex; align-items: center; gap: .4rem; animation: hintPulse 2s ease-in-out infinite; cursor: pointer; }
+@keyframes hintPulse { 0%,100%{opacity:.45;} 50%{opacity:1;} }
 
-/* Spine */
-.ob-spine-open{
-  position:absolute;
-  left:50%;
-  transform:translateX(-50%);
-  top:0;
-  bottom:0;
-  width:14px;
-  background:linear-gradient(90deg,#1a100a,#2d1f0f 40%,#3d2a10 60%,#2d1f0f 80%,#1a100a);
-  border-left:1px solid rgba(184,137,42,.2);
-  border-right:1px solid rgba(184,137,42,.2);
-  z-index:25;
-}
+/* SPREAD (2-PAGE CONTAINER) */
+.ob-open-wrap { display: none; }
+.ob-open-wrap.show { display: flex; flex-direction: column; align-items: center; gap: .75rem; }
 
-/* Right Page */
-.ob-rp{
-  position:absolute;
-  right:0;
-  top:0;
-  width:215px;
-  height:100%;
-  background:linear-gradient(to left,#ede2c5,#f8f0dc);
-  border:1px solid var(--border);border-left:none;
-  border-radius:0 4px 4px 0;
-  overflow:hidden;
-  opacity:0;
-  transition:opacity .4s .4s ease-out;
-}
-.ob-rp.visible{opacity:1;}
-.ob-rp-gutter{
-  position:absolute;top:0;bottom:0;left:0;width:18px;
-  background:linear-gradient(to left,transparent,rgba(26,18,8,.1));
-  pointer-events:none;
+.ob-spread {
+  position: relative;
+  display: flex;
+  width: 440px;
+  height: 290px;
+  box-shadow: 0 20px 45px rgba(26,18,8,.25);
+  border-radius: 4px;
 }
 
-/* Reviews Left Page */
-.ob-lp-reviews{
-  width:100%;height:100%;
-  padding:1.2rem 1.1rem 1rem !important;
-  display:flex;flex-direction:column;
+/* LEFT PAGE (Reviews) */
+.ob-page-left {
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right,#ede2c5,#f8f0dc);
+  border: 1px solid var(--border);
+  border-right: none;
+  border-radius: 4px 0 0 4px;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
 }
-.ob-lp-review-header{display:flex;align-items:center;gap:.5rem;margin-bottom:.5rem;}
-.ob-lp-stars{color:var(--gold);font-size:11px;letter-spacing:2px;}
-.ob-lp-rtag{font-family:var(--font-mono);font-size:7.5px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;}
-.ob-lp-header-rule{width:100%;height:1px;background:linear-gradient(90deg,var(--gold),transparent);margin-bottom:.65rem;opacity:.3;}
+.ob-page-left::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; right: 0; width: 16px;
+  background: linear-gradient(to right, transparent, rgba(26,18,8,.08));
+  pointer-events: none;
+}
 
-.ob-lp-rv-list{position:relative;flex:1;min-height:95px;}
-.ob-lp-rv{position:absolute;inset:0;opacity:0;transition:opacity .5s ease;pointer-events:none;}
-.ob-lp-rv.active{opacity:1;pointer-events:auto;}
-.ob-lp-rv-text{font-family:var(--font-serif);font-style:italic;font-size:.76rem;color:var(--ink2);line-height:1.75;margin-bottom:.5rem;}
-.ob-lp-rv-auth{font-family:var(--font-mono);font-size:.58rem;color:var(--gold);letter-spacing:.08em;}
+/* CENTER SPINE */
+.ob-spine-open {
+  width: 12px;
+  height: 100%;
+  background: linear-gradient(90deg,#1a100a,#2d1f0f 40%,#3d2a10 60%,#2d1f0f 80%,#1a100a);
+  border-left: 1px solid rgba(184,137,42,.2);
+  border-right: 1px solid rgba(184,137,42,.2);
+  z-index: 5;
+  flex-shrink: 0;
+}
 
-.ob-lp-dots{display:flex;gap:.35rem;margin-top:.4rem;}
-.ob-lp-dot{width:16px;height:2px;background:rgba(26,18,8,.15);cursor:pointer;transition:background .3s,width .3s;}
-.ob-lp-dot.active{background:var(--gold);width:24px;}
-.ob-lp-footer{font-family:var(--font-serif);font-style:italic;font-size:.68rem;color:rgba(26,18,8,.35);width:100%;text-align:center;border-top:1px solid rgba(184,137,42,.15);padding-top:.45rem;margin-top:.4rem;}
+/* RIGHT PAGE (About Author) */
+.ob-page-right {
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to left,#ede2c5,#f8f0dc);
+  border: 1px solid var(--border);
+  border-left: none;
+  border-radius: 0 4px 4px 0;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+.ob-page-right::before {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0; left: 0; width: 16px;
+  background: linear-gradient(to left, transparent, rgba(26,18,8,.08));
+  pointer-events: none;
+}
 
-/* Author Right Page */
-.ob-rp-content{height:100%;padding:1.2rem 1.2rem 1rem 1.4rem;display:flex;flex-direction:column;position:relative;z-index:1;}
-.ob-r-chapter{font-family:var(--font-mono);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin-bottom:.35rem;}
-.ob-r-rule{height:1px;background:linear-gradient(90deg,var(--gold),transparent);margin-bottom:.5rem;opacity:.35;}
-.ob-r-name{font-family:var(--font-serif);font-style:italic;font-size:1.25rem;color:var(--ink);margin-bottom:.4rem;line-height:1;}
-.ob-r-lines{display:flex;flex-direction:column;gap:.08rem;}
-.ob-r-line{font-family:var(--font-serif);font-style:italic;font-size:.73rem;color:var(--muted2);line-height:1.6;opacity:0;transform:translateX(6px);transition:opacity .4s,transform .4s;}
-.ob-r-line.lit{opacity:1;transform:none;}
-.ob-r-spacer{height:.3rem;}
-.gold-line{font-style:normal !important;color:var(--gold) !important;font-size:.68rem !important;font-weight:500;}
-.ob-r-quote{font-family:var(--font-serif);font-style:italic;font-size:.66rem;color:var(--muted);line-height:1.6;margin-top:auto;padding-top:.4rem;border-top:1px solid rgba(184,137,42,.14);opacity:0;transition:opacity .5s;}
-.ob-r-quote.lit{opacity:1;}
-.ob-r-pagenum{font-family:var(--font-mono);font-size:7px;color:var(--muted);letter-spacing:.1em;text-align:center;margin-top:.25rem;opacity:.35;}
+/* Reviews Left Page Content */
+.ob-lp-reviews {
+  width: 100%;
+  height: 100%;
+  padding: 1.2rem 1.1rem 1rem;
+  display: flex;
+  flex-direction: column;
+}
+.ob-lp-review-header { display: flex; align-items: center; gap: .5rem; margin-bottom: .5rem; }
+.ob-lp-stars { color: var(--gold); font-size: 11px; letter-spacing: 2px; }
+.ob-lp-rtag { font-family: var(--font-mono); font-size: 7.5px; letter-spacing: .15em; color: var(--muted); text-transform: uppercase; }
+.ob-lp-header-rule { width: 100%; height: 1px; background: linear-gradient(90deg,var(--gold),transparent); margin-bottom: .65rem; opacity: .3; }
 
-.ob-open-shadow{width:410px;height:14px;margin-top:-3px;background:radial-gradient(ellipse,rgba(26,18,8,.2),transparent 70%);filter:blur(6px);}
-.ob-close-hint{font-family:var(--font-mono);font-size:9px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;opacity:.45;cursor:pointer;transition:opacity .2s;margin-top:.3rem;}
-.ob-close-hint:hover{opacity:.9;color:var(--gold);}
+.ob-lp-rv-list { position: relative; flex: 1; min-height: 95px; }
+.ob-lp-rv { position: absolute; inset: 0; opacity: 0; transition: opacity .5s ease; pointer-events: none; }
+.ob-lp-rv.active { opacity: 1; pointer-events: auto; }
+.ob-lp-rv-text { font-family: var(--font-serif); font-style: italic; font-size: .75rem; color: var(--ink2); line-height: 1.7; margin-bottom: .5rem; }
+.ob-lp-rv-auth { font-family: var(--font-mono); font-size: .58rem; color: var(--gold); letter-spacing: .08em; }
+
+.ob-lp-dots { display: flex; gap: .35rem; margin-top: .4rem; }
+.ob-lp-dot { width: 16px; height: 2px; background: rgba(26,18,8,.15); cursor: pointer; transition: background .3s, width .3s; }
+.ob-lp-dot.active { background: var(--gold); width: 24px; }
+.ob-lp-footer { font-family: var(--font-serif); font-style: italic; font-size: .68rem; color: rgba(26,18,8,.35); width: 100%; text-align: center; border-top: 1px solid rgba(184,137,42,.15); padding-top: .45rem; margin-top: .4rem; }
+
+/* Right Page Content */
+.ob-rp-content {
+  height: 100%;
+  padding: 1.2rem 1.2rem 1rem 1.3rem;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  z-index: 2;
+}
+.ob-r-chapter { font-family: var(--font-mono); font-size: 8px; letter-spacing: .2em; text-transform: uppercase; color: var(--muted); margin-bottom: .35rem; }
+.ob-r-rule { height: 1px; background: linear-gradient(90deg,var(--gold),transparent); margin-bottom: .5rem; opacity: .35; }
+.ob-r-name { font-family: var(--font-serif); font-style: italic; font-size: 1.25rem; color: var(--ink); margin-bottom: .4rem; line-height: 1; }
+.ob-r-lines { display: flex; flex-direction: column; gap: .1rem; }
+.ob-r-line {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: .73rem;
+  color: var(--muted2);
+  line-height: 1.6;
+  opacity: 0;
+  transform: translateX(8px);
+  transition: opacity .4s ease, transform .4s ease;
+}
+.ob-r-line.lit { opacity: 1; transform: translateX(0); }
+.ob-r-spacer { height: .3rem; }
+.gold-line { font-style: normal !important; color: var(--gold) !important; font-size: .68rem !important; font-weight: 500; }
+.ob-r-quote { font-family: var(--font-serif); font-style: italic; font-size: .66rem; color: var(--muted); line-height: 1.6; margin-top: auto; padding-top: .4rem; border-top: 1px solid rgba(184,137,42,.14); opacity: 0; transition: opacity .5s ease; }
+.ob-r-quote.lit { opacity: 1; }
+.ob-r-pagenum { font-family: var(--font-mono); font-size: 7px; color: var(--muted); letter-spacing: .1em; text-align: center; margin-top: .25rem; opacity: .35; }
+
+.ob-open-shadow { width: 420px; height: 14px; margin-top: -3px; background: radial-gradient(ellipse,rgba(26,18,8,.2),transparent 70%); filter: blur(6px); }
+.ob-close-hint { font-family: var(--font-mono); font-size: 9px; letter-spacing: .14em; color: var(--muted); text-transform: uppercase; opacity: .5; cursor: pointer; transition: opacity .2s; margin-top: .3rem; }
+.ob-close-hint:hover { opacity: .9; color: var(--gold); }
 
 /* REST OF PAGE STYLES */
 .genre-strip{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid var(--border);border-bottom:1px solid var(--border);background:var(--paper2);}
@@ -481,7 +488,6 @@ nav.scrolled{background:rgba(253,246,232,.97);backdrop-filter:blur(12px);box-sha
   body{cursor:auto;}
   .cur-dot,.cur-ring{display:none;}
   .ob-spread{width:320px;height:230px;}
-  .ob-flap,.ob-rp{width:160px;}
   .ob-open-shadow{width:300px;}
 }
 </style>
@@ -634,57 +640,46 @@ nav.scrolled{background:rgba(253,246,232,.97);backdrop-filter:blur(12px);box-sha
       </div>
       <div class="ob-closed-hint" id="obClosedHint" onclick="openBook()">✦ &nbsp;Click to open&nbsp; ✦</div>
 
-      <!-- OPEN BOOK CONTAINER (WITH ID="obFlap" RESTORED) -->
+      <!-- OPEN BOOK SPREAD -->
       <div class="ob-open-wrap" id="obOpenWrap">
         <div class="ob-spread" id="obSpread">
           
-          <!-- LEFT ROTATING FLAP -->
-          <div class="ob-flap" id="obFlap">
-            <!-- Front of flap (shows during closed state) -->
-            <div class="ob-flap-front">
-              <span style="font-family:var(--font-serif);font-size:2.8rem;color:var(--gold);font-style:italic;">V</span>
-              <div style="width:30px;height:1px;background:var(--gold);margin:.4rem auto;opacity:.5;"></div>
-              <span style="font-family:var(--font-mono);font-size:7px;letter-spacing:.2em;color:rgba(253,246,232,.5);text-transform:uppercase;">Vinky K.</span>
-            </div>
-            
-            <!-- Back of flap (reveals left page reviews when flipped) -->
-            <div class="ob-flap-back">
-              <div class="ob-lp-reviews">
-                <div class="ob-lp-review-header">
-                  <span class="ob-lp-stars">★★★★★</span>
-                  <span class="ob-lp-rtag">Reader Reviews</span>
-                </div>
-                <div class="ob-lp-header-rule"></div>
-                <div class="ob-lp-rv-list">
-                  <div class="ob-lp-rv active">
-                    <div class="ob-lp-rv-text">"A page-turner from the very first chapter. The twists kept me guessing until the very last page — and then some!"</div>
-                    <div class="ob-lp-rv-auth">— Verified Reader · Amazon India</div>
-                  </div>
-                  <div class="ob-lp-rv">
-                    <div class="ob-lp-rv-text">"Prisha is one of the most compelling protagonists I've read in years. You never know who to trust."</div>
-                    <div class="ob-lp-rv-auth">— Verified Reader · Goodreads</div>
-                  </div>
-                  <div class="ob-lp-rv">
-                    <div class="ob-lp-rv-text">"Bold debut. Vinky K blends tech thriller and identity drama in a way that feels completely fresh."</div>
-                    <div class="ob-lp-rv-auth">— Verified Reader · Flipkart</div>
-                  </div>
-                </div>
-                <div class="ob-lp-dots">
-                  <span class="ob-lp-dot active" onclick="goLpReview(0)"></span>
-                  <span class="ob-lp-dot" onclick="goLpReview(1)"></span>
-                  <span class="ob-lp-dot" onclick="goLpReview(2)"></span>
-                </div>
-                <div class="ob-lp-footer">❧ &nbsp;Vinky K. &nbsp;❧</div>
+          <!-- LEFT PAGE: REVIEWS -->
+          <div class="ob-page-left">
+            <div class="ob-lp-reviews">
+              <div class="ob-lp-review-header">
+                <span class="ob-lp-stars">★★★★★</span>
+                <span class="ob-lp-rtag">Reader Reviews</span>
               </div>
+              <div class="ob-lp-header-rule"></div>
+              <div class="ob-lp-rv-list">
+                <div class="ob-lp-rv active">
+                  <div class="ob-lp-rv-text">"A page-turner from the very first chapter. The twists kept me guessing until the very last page — and then some!"</div>
+                  <div class="ob-lp-rv-auth">— Verified Reader · Amazon India</div>
+                </div>
+                <div class="ob-lp-rv">
+                  <div class="ob-lp-rv-text">"Prisha is one of the most compelling protagonists I've read in years. You never know who to trust."</div>
+                  <div class="ob-lp-rv-auth">— Verified Reader · Goodreads</div>
+                </div>
+                <div class="ob-lp-rv">
+                  <div class="ob-lp-rv-text">"Bold debut. Vinky K blends tech thriller and identity drama in a way that feels completely fresh."</div>
+                  <div class="ob-lp-rv-auth">— Verified Reader · Flipkart</div>
+                </div>
+              </div>
+              <div class="ob-lp-dots">
+                <span class="ob-lp-dot active" onclick="goLpReview(0)"></span>
+                <span class="ob-lp-dot" onclick="goLpReview(1)"></span>
+                <span class="ob-lp-dot" onclick="goLpReview(2)"></span>
+              </div>
+              <div class="ob-lp-footer">❧ &nbsp;Vinky K. &nbsp;❧</div>
             </div>
           </div>
 
           <!-- CENTER BOOK SPINE -->
           <div class="ob-spine-open"></div>
 
-          <!-- RIGHT PAGE -->
-          <div class="ob-rp" id="obPageR">
-            <div class="ob-rp-gutter"></div>
+          <!-- RIGHT PAGE: ABOUT AUTHOR -->
+          <div class="ob-page-right" id="obPageR">
             <div class="ob-rp-content">
               <div class="ob-r-chapter">About the Author</div>
               <div class="ob-r-rule"></div>
@@ -905,84 +900,73 @@ function startLpRotator(){
 }
 
 // ═══════════════════════════════════════════
-// BOOK ANIMATION (FIXED)
+// BOOK ANIMATION (SIDE-BY-SIDE FIXED)
 // ═══════════════════════════════════════════
 function openBook(){
   var closed = document.getElementById('obClosed');
   var hint   = document.getElementById('obClosedHint');
   var wrap   = document.getElementById('obOpenWrap');
-  var flap   = document.getElementById('obFlap');
-  var rp     = document.getElementById('obPageR');
   var quote  = document.getElementById('obQuote');
 
-  if(!closed || !wrap || !flap) return;
+  if(!closed || !wrap) return;
 
-  // Fade out closed book
-  closed.style.transition = 'opacity .35s, transform .35s';
+  // 1. Smoothly fade out closed cover
+  closed.style.transition = 'opacity .3s, transform .3s';
   closed.style.opacity    = '0';
-  closed.style.transform  = 'scale(.9) translateY(-6px)';
-  hint.style.transition   = 'opacity .25s';
+  closed.style.transform  = 'scale(.92) translateY(-8px)';
+  hint.style.transition   = 'opacity .2s';
   hint.style.opacity      = '0';
 
   setTimeout(function(){
     closed.style.display = 'none';
     hint.style.display   = 'none';
 
+    // 2. Reveal the 2-page spread
     wrap.classList.add('show');
 
-    // Smooth page flip execution
-    requestAnimationFrame(function(){
+    // 3. Stagger-in the lines on the Right Page (Author info)
+    var lineIds = ['rl1','rl2','rl3','rl5','rl6'];
+    lineIds.forEach(function(id, i){
       setTimeout(function(){
-        flap.classList.add('open');
-        if(rp) rp.classList.add('visible');
-
-        var lineIds = ['rl1','rl2','rl3','rl5','rl6'];
-        lineIds.forEach(function(id, i){
-          setTimeout(function(){
-            var el = document.getElementById(id);
-            if(el) el.classList.add('lit');
-          }, 800 + (i * 180));
-        });
-
-        setTimeout(function(){
-          if(quote) quote.classList.add('lit');
-          startLpRotator();
-        }, 1800);
-      }, 50);
+        var el = document.getElementById(id);
+        if(el) el.classList.add('lit');
+      }, 250 + (i * 150));
     });
-  }, 350);
+
+    // 4. Reveal bottom quote & start reviews rotator on the Left Page
+    setTimeout(function(){
+      if(quote) quote.classList.add('lit');
+      startLpRotator();
+    }, 1100);
+  }, 300);
 }
 
 function closeBook(){
   var closed = document.getElementById('obClosed');
   var hint   = document.getElementById('obClosedHint');
   var wrap   = document.getElementById('obOpenWrap');
-  var flap   = document.getElementById('obFlap');
-  var rp     = document.getElementById('obPageR');
   var quote  = document.getElementById('obQuote');
 
-  if(!flap || !wrap) return;
+  if(!wrap || !closed) return;
 
-  flap.classList.remove('open');
-  if(rp) rp.classList.remove('visible');
   clearInterval(lpReviewTimer);
 
+  // Reset lines on right page
   ['rl1','rl2','rl3','rl4','rl5','rl6'].forEach(function(id){
     var el = document.getElementById(id);
     if(el) el.classList.remove('lit');
   });
   if(quote) quote.classList.remove('lit');
 
+  wrap.classList.remove('show');
+  closed.style.display = '';
+  hint.style.display   = '';
+
   setTimeout(function(){
-    wrap.classList.remove('show');
-    closed.style.display = '';
-    hint.style.display   = '';
-    setTimeout(function(){
-      closed.style.opacity   = '1';
-      closed.style.transform = '';
-      hint.style.opacity     = '';
-    }, 50);
-  }, 700);
+    closed.style.opacity   = '1';
+    closed.style.transform = '';
+    hint.style.opacity     = '';
+  }, 50);
 }
 
 // Smooth scroll
