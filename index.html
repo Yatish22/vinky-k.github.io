@@ -734,7 +734,7 @@ nav.scrolled{background:rgba(253,246,232,.97);backdrop-filter:blur(12px);box-sha
       </div>
 
       <div class="book-controls">
-        <button class="hint-toggle" id="bookToggleBtn" onclick="toggleBook()">✦ &nbsp;Click to open&nbsp; ✦</button>
+        <button class="hint-toggle" id="bookToggleBtn" onclick="toggleBook()">✕ &nbsp;Close Book</button>
       </div>
     </div>
   </div>
@@ -932,7 +932,7 @@ function startLpRotator(){
 }
 
 // ═══════════════════════════════════════════
-// TRUE 3D BOOK FLIP LOGIC
+// TRUE 3D BOOK FLIP LOGIC (AUTO-OPEN SUPPORT)
 // ═══════════════════════════════════════════
 var isBookOpen = false;
 
@@ -946,7 +946,7 @@ function toggleBook(){
     // OPEN ANIMATION
     isBookOpen = true;
     book.classList.add('open');
-    btn.innerHTML = '✕ &nbsp;Close Book';
+    if(btn) btn.innerHTML = '✕ &nbsp;Close Book';
 
     // Stagger in author details on right page as the cover swings open
     lineIds.forEach(function(id, i){
@@ -965,7 +965,7 @@ function toggleBook(){
     // CLOSE ANIMATION
     isBookOpen = false;
     book.classList.remove('open');
-    btn.innerHTML = '✦ &nbsp;Click to open&nbsp; ✦';
+    if(btn) btn.innerHTML = '✦ &nbsp;Click to open&nbsp; ✦';
     clearInterval(lpReviewTimer);
 
     lineIds.forEach(function(id){
@@ -975,6 +975,15 @@ function toggleBook(){
     if(quote) quote.classList.remove('lit');
   }
 }
+
+// AUTO-OPEN: Triggers after 1.2s so the visitor first sees the closed cover flip open live
+window.addEventListener('load', function(){
+  setTimeout(function(){
+    if(!isBookOpen){
+      toggleBook();
+    }
+  }, 1200);
+});
 
 // Smooth scroll
 document.querySelectorAll('a[href^="#"]').forEach(a=>{
