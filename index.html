@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
 <title>Vinky K — Author</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Special+Elite&family=Inter:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
 <style>
@@ -75,7 +75,18 @@ nav.scrolled{background:rgba(253,246,232,.97);backdrop-filter:blur(12px);box-sha
 .btn-outline{background:transparent;color:var(--muted2);border:1px solid var(--border);}
 .btn-outline:hover{border-color:var(--gold);color:var(--gold);}
 
-.hero-right{position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;justify-content:center;opacity:0;animation:fadeIn .9s .6s forwards;width:100%;}
+.hero-right{
+  position:relative;
+  z-index:2;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  opacity:0;
+  animation:fadeIn .9s .6s forwards;
+  overflow:hidden;
+}
 .hero-stats{display:flex;gap:2.5rem;margin-top:2.5rem;padding-top:2rem;border-top:1px solid var(--border);opacity:0;animation:fadeUp .6s 1.3s forwards;}
 .stat-val{font-family:var(--font-serif);font-size:2rem;color:var(--gold);display:block;line-height:1;}
 .stat-label{font-size:11px;color:var(--muted);letter-spacing:.04em;margin-top:2px;}
@@ -86,14 +97,21 @@ nav.scrolled{background:rgba(253,246,232,.97);backdrop-filter:blur(12px);box-sha
 @keyframes sp{0%,100%{transform:scaleY(1);}50%{transform:scaleY(1.3);}}
 
 /* ══════════════════════════════════════
-   3D BOOK COMPONENT (NO-BLEED & FULL RESPONSIVE)
+   RESPONSIVE SCALED 3D BOOK (FIT ALL SCREENS)
 ══════════════════════════════════════ */
 .ob-scene {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
   width: 100%;
-  max-width: 440px;
+}
+
+.book-scaler {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
 }
 
 .book-stage {
@@ -105,6 +123,7 @@ nav.scrolled{background:rgba(253,246,232,.97);backdrop-filter:blur(12px);box-sha
   display: flex;
   justify-content: center;
   align-items: center;
+  transform-origin: center center;
 }
 
 .book-3d {
@@ -217,7 +236,7 @@ nav.scrolled{background:rgba(253,246,232,.97);backdrop-filter:blur(12px);box-sha
 .cover-genre { font-family: var(--font-mono); font-size: .52rem; color: rgba(184,137,42,.5); letter-spacing: .15em; text-transform: uppercase; margin-top: 3px; }
 .cover-year { position: absolute; bottom: .8rem; left: 0; right: 0; font-family: var(--font-mono); font-size: .45rem; letter-spacing: .12em; color: rgba(184,137,42,.35); text-transform: uppercase; text-align: center; }
 
-/* BACK OF FLAP (Left Reviews Page) - 100% OPAQUE, ZERO BLEED THROUGH */
+/* BACK OF FLAP (Left Reviews Page) */
 .cover-face-back {
   position: absolute;
   inset: 0;
@@ -521,8 +540,8 @@ nav.scrolled{background:rgba(253,246,232,.97);backdrop-filter:blur(12px);box-sha
 @media(max-width:900px){
   nav{padding:1rem 1.5rem;}
   .nav-links{display:none;}
-  .hero{grid-template-columns:1fr;padding:7rem 1.5rem 4rem;gap:3rem;}
-  .hero-right{order:-1;}
+  .hero{grid-template-columns:1fr;padding:7rem 1.25rem 4rem;gap:2.5rem;}
+  .hero-right{order:-1;margin:0 auto;width:100%;max-width:100%;}
   .about-sec,.spotlight-inner,.nl-sec,.footer-top{grid-template-columns:1fr;gap:3rem;padding:5rem 1.5rem;}
   .genre-strip{grid-template-columns:1fr;}
   .gi{border-right:none;border-bottom:1px solid var(--border);}
@@ -535,19 +554,17 @@ nav.scrolled{background:rgba(253,246,232,.97);backdrop-filter:blur(12px);box-sha
   body{cursor:auto;}
   .cur-dot,.cur-ring{display:none;}
 
-  /* Scale book smoothly for mobile screens without clipping */
-  .ob-scene {
-    max-width: 100%;
-    transform: scale(0.78);
-    transform-origin: center center;
-    margin: -25px 0 -15px;
+  /* Automatic scaling: adapts cleanly to 340px, 375px, 390px, 414px etc. */
+  .book-stage {
+    zoom: 0.72;
+    -moz-transform: scale(0.72);
   }
 }
 
-@media(max-width:380px){
-  .ob-scene {
-    transform: scale(0.70);
-    margin: -40px 0 -25px;
+@media(max-width:370px){
+  .book-stage {
+    zoom: 0.64;
+    -moz-transform: scale(0.64);
   }
 }
 </style>
@@ -677,81 +694,83 @@ nav.scrolled{background:rgba(253,246,232,.97);backdrop-filter:blur(12px);box-sha
   </div>
 
   <div class="hero-right">
-    <!-- 3D FLIPPING BOOK STAGE -->
+    <!-- 3D FLIPPING BOOK STAGE (CONTAINED) -->
     <div class="ob-scene">
-      <div class="book-stage">
-        <div class="book-3d" id="book3d">
+      <div class="book-scaler">
+        <div class="book-stage">
+          <div class="book-3d" id="book3d">
 
-          <!-- Central Book Spine -->
-          <div class="book-spine"></div>
+            <!-- Central Book Spine -->
+            <div class="book-spine"></div>
 
-          <!-- RIGHT PAGE (About Author) -->
-          <div class="page-right">
-            <div class="ob-rp-content">
-              <div class="ob-r-chapter">About the Author</div>
-              <div class="ob-r-rule"></div>
-              <div class="ob-r-name">Vinky K.</div>
-              <div class="ob-r-lines">
-                <div class="ob-r-line" id="rl1">Indian author. Mystery &amp; Thriller.</div>
-                <div class="ob-r-line" id="rl2">Writes at the edge of technology</div>
-                <div class="ob-r-line" id="rl3">and what it means to be human.</div>
-                <div class="ob-r-line ob-r-spacer" id="rl4"></div>
-                <div class="ob-r-line gold-line" id="rl5">Debut — The Coder Girl · 2025</div>
-                <div class="ob-r-line gold-line" id="rl6">Latest — The Decoder · 2026</div>
+            <!-- RIGHT PAGE (About Author) -->
+            <div class="page-right">
+              <div class="ob-rp-content">
+                <div class="ob-r-chapter">About the Author</div>
+                <div class="ob-r-rule"></div>
+                <div class="ob-r-name">Vinky K.</div>
+                <div class="ob-r-lines">
+                  <div class="ob-r-line" id="rl1">Indian author. Mystery &amp; Thriller.</div>
+                  <div class="ob-r-line" id="rl2">Writes at the edge of technology</div>
+                  <div class="ob-r-line" id="rl3">and what it means to be human.</div>
+                  <div class="ob-r-line ob-r-spacer" id="rl4"></div>
+                  <div class="ob-r-line gold-line" id="rl5">Debut — The Coder Girl · 2025</div>
+                  <div class="ob-r-line gold-line" id="rl6">Latest — The Decoder · 2026</div>
+                </div>
+                <div class="ob-r-quote" id="obQuote">"Questions with no easy answers — that is where every story begins."</div>
+                <div class="ob-r-pagenum">— p. 1 —</div>
               </div>
-              <div class="ob-r-quote" id="obQuote">"Questions with no easy answers — that is where every story begins."</div>
-              <div class="ob-r-pagenum">— p. 1 —</div>
             </div>
+
+            <!-- ROTATING 3D FRONT COVER -->
+            <div class="cover-flap" id="coverFlap" onclick="toggleBook()">
+              <!-- Front face: Book Cover -->
+              <div class="cover-face-front">
+                <div class="cover-pattern"></div>
+                <div class="cover-border"></div>
+                <div class="cover-content">
+                  <span class="cover-ornament">✦</span>
+                  <span class="cover-initial">V</span>
+                  <div class="cover-div"></div>
+                  <div class="cover-author">Vinky K.</div>
+                  <div class="cover-genre">Author · Mystery &amp; Thriller</div>
+                </div>
+                <div class="cover-year">Est. 2025 · The Coder Girl Series</div>
+              </div>
+
+              <!-- Back face: Left Reviews Page -->
+              <div class="cover-face-back">
+                <div class="ob-lp-reviews">
+                  <div class="ob-lp-review-header">
+                    <span class="ob-lp-stars">★★★★★</span>
+                    <span class="ob-lp-rtag">Reader Reviews</span>
+                  </div>
+                  <div class="ob-lp-header-rule"></div>
+                  <div class="ob-lp-rv-list">
+                    <div class="ob-lp-rv active">
+                      <div class="ob-lp-rv-text">"A page-turner from the very first chapter. The twists kept me guessing until the very last page — and then some!"</div>
+                      <div class="ob-lp-rv-auth">— Verified Reader · Amazon India</div>
+                    </div>
+                    <div class="ob-lp-rv">
+                      <div class="ob-lp-rv-text">"Prisha is one of the most compelling protagonists I've read in years. You never know who to trust."</div>
+                      <div class="ob-lp-rv-auth">— Verified Reader · Goodreads</div>
+                    </div>
+                    <div class="ob-lp-rv">
+                      <div class="ob-lp-rv-text">"Bold debut. Vinky K blends tech thriller and identity drama in a way that feels completely fresh."</div>
+                      <div class="ob-lp-rv-auth">— Verified Reader · Flipkart</div>
+                    </div>
+                  </div>
+                  <div class="ob-lp-dots">
+                    <span class="ob-lp-dot active" onclick="event.stopPropagation(); goLpReview(0)"></span>
+                    <span class="ob-lp-dot" onclick="event.stopPropagation(); goLpReview(1)"></span>
+                    <span class="ob-lp-dot" onclick="event.stopPropagation(); goLpReview(2)"></span>
+                  </div>
+                  <div class="ob-lp-footer">❧ &nbsp;Vinky K. &nbsp;❧</div>
+                </div>
+              </div>
+            </div>
+
           </div>
-
-          <!-- ROTATING 3D FRONT COVER -->
-          <div class="cover-flap" id="coverFlap" onclick="toggleBook()">
-            <!-- Front face: Book Cover -->
-            <div class="cover-face-front">
-              <div class="cover-pattern"></div>
-              <div class="cover-border"></div>
-              <div class="cover-content">
-                <span class="cover-ornament">✦</span>
-                <span class="cover-initial">V</span>
-                <div class="cover-div"></div>
-                <div class="cover-author">Vinky K.</div>
-                <div class="cover-genre">Author · Mystery &amp; Thriller</div>
-              </div>
-              <div class="cover-year">Est. 2025 · The Coder Girl Series</div>
-            </div>
-
-            <!-- Back face: Left Reviews Page (100% Opaque, No Mirror Ghosting) -->
-            <div class="cover-face-back">
-              <div class="ob-lp-reviews">
-                <div class="ob-lp-review-header">
-                  <span class="ob-lp-stars">★★★★★</span>
-                  <span class="ob-lp-rtag">Reader Reviews</span>
-                </div>
-                <div class="ob-lp-header-rule"></div>
-                <div class="ob-lp-rv-list">
-                  <div class="ob-lp-rv active">
-                    <div class="ob-lp-rv-text">"A page-turner from the very first chapter. The twists kept me guessing until the very last page — and then some!"</div>
-                    <div class="ob-lp-rv-auth">— Verified Reader · Amazon India</div>
-                  </div>
-                  <div class="ob-lp-rv">
-                    <div class="ob-lp-rv-text">"Prisha is one of the most compelling protagonists I've read in years. You never know who to trust."</div>
-                    <div class="ob-lp-rv-auth">— Verified Reader · Goodreads</div>
-                  </div>
-                  <div class="ob-lp-rv">
-                    <div class="ob-lp-rv-text">"Bold debut. Vinky K blends tech thriller and identity drama in a way that feels completely fresh."</div>
-                    <div class="ob-lp-rv-auth">— Verified Reader · Flipkart</div>
-                  </div>
-                </div>
-                <div class="ob-lp-dots">
-                  <span class="ob-lp-dot active" onclick="event.stopPropagation(); goLpReview(0)"></span>
-                  <span class="ob-lp-dot" onclick="event.stopPropagation(); goLpReview(1)"></span>
-                  <span class="ob-lp-dot" onclick="event.stopPropagation(); goLpReview(2)"></span>
-                </div>
-                <div class="ob-lp-footer">❧ &nbsp;Vinky K. &nbsp;❧</div>
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
 
